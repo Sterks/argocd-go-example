@@ -18,48 +18,6 @@ spec:
           enableCRD: true
         crds:
           enabled: true
-        vmcluster:
-          enabled: true
-          name: victoriametrics
-          spec:
-            retentionPeriod: "1"
-            replicationFactor: 1
-            vminsert:
-              replicaCount: 2
-              resources:
-                requests:
-                  cpu: 100m
-                  memory: 256Mi
-                limits:
-                  cpu: 500m
-                  memory: 512Mi
-            vmselect:
-              replicaCount: 2
-              resources:
-                requests:
-                  cpu: 100m
-                  memory: 512Mi
-                limits:
-                  cpu: 1000m
-                  memory: 1Gi
-            vmstorage:
-              replicaCount: 1
-              resources:
-                requests:
-                  cpu: 200m
-                  memory: 1Gi
-                limits:
-                  cpu: 1000m
-                  memory: 2Gi
-              storage:
-                volumeClaimTemplate:
-                  spec:
-                    accessModes:
-                      - ReadWriteOnce
-                    storageClassName: local-path
-                    resources:
-                      requests:
-                        storage: 5Gi
   destination:
     server: https://kubernetes.default.svc
     namespace: victoriametrics
@@ -71,3 +29,53 @@ spec:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMCluster
+metadata:
+  name: victoriametrics
+  namespace: victoriametrics
+  labels:
+    app.kubernetes.io/name: victoriametrics
+    app.kubernetes.io/component: cluster
+spec:
+  retentionPeriod: "1"
+  replicationFactor: 1
+
+  vminsert:
+    replicaCount: 2
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+  vmselect:
+    replicaCount: 2
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+
+  vmstorage:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: 200m
+        memory: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          storageClassName: "local-path"
+          resources:
+            requests:
+              storage: 5Gi
