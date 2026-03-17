@@ -5,8 +5,6 @@ namespace: argocd
 
 resources:
   - namespace.yaml
-  - vault.yaml
-  - victoriametrics.yaml
 
 commonLabels:
   app: argocd-go-example
