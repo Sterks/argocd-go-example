@@ -101,6 +101,9 @@ rules:
   - apiGroups: ["operator.victoriametrics.com"]
     resources: ["vmclusters/status", "vmsingles/status"]
     verbs: ["get", "update", "patch"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "create", "update", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
