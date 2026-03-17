@@ -11,10 +11,7 @@ IMAGE_NAME="argocd-go-example"
 TAG="${1:-latest}"
 FULL_IMAGE="${REGISTRY}/${IMAGE_NAME}:${TAG}"
 
-echo "Building image: ${FULL_IMAGE}"
-docker build -t "${FULL_IMAGE}" .
-
-echo "Pushing image to registry: ${FULL_IMAGE}"
-docker push "${FULL_IMAGE}"
+echo "Building image for linux/amd64: ${FULL_IMAGE}"
+docker buildx build --platform linux/amd64 -t "${FULL_IMAGE}" --push .
 
 echo "Done! Image pushed: ${FULL_IMAGE}"

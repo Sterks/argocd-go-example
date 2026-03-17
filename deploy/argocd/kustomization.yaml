@@ -8,6 +8,8 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - vault-application.yaml
+  - victoria-metrics-application.yaml
 
 commonLabels:
   app: argocd-go-example
