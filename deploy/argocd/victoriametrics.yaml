@@ -33,6 +33,14 @@ spec:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
+    ignoreDifferences:
+      - group: admissionregistration.k8s.io
+        kind: ValidatingWebhookConfiguration
+        name: victoriametrics-victoria-metrics-operator-admission
+      - group: ''
+        kind: Secret
+        name: victoriametrics-victoria-metrics-operator-validation
+        namespace: victoriametrics
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMCluster
