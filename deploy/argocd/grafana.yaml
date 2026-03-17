@@ -39,6 +39,47 @@ spec:
           limits:
             cpu: 500m
             memory: 512Mi
+        sidecar:
+          dashboards:
+            enabled: true
+            searchNamespace: ALL
+            provider:
+              name: kubernetes-dashboards
+              folder: Kubernetes
+        dashboards:
+          kubernetes:
+            kubernetes-cluster:
+              gnetId: 6417
+              revision: 1
+              datasource: VictoriaMetrics
+            kubernetes-nodes:
+              gnetId: 14205
+              revision: 1
+              datasource: VictoriaMetrics
+            kubernetes-pods:
+              gnetId: 6336
+              revision: 1
+              datasource: VictoriaMetrics
+            kubernetes-namespaces:
+              gnetId: 14206
+              revision: 1
+              datasource: VictoriaMetrics
+            kubernetes-statefulset:
+              gnetId: 14207
+              revision: 1
+              datasource: VictoriaMetrics
+            kubernetes-deployment:
+              gnetId: 14208
+              revision: 1
+              datasource: VictoriaMetrics
+            kubernetes-daemonset:
+              gnetId: 14209
+              revision: 1
+              datasource: VictoriaMetrics
+            victoria-metrics:
+              gnetId: 10225
+              revision: 1
+              datasource: VictoriaMetrics
   destination:
     server: https://kubernetes.default.svc
     namespace: grafana
