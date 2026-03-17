@@ -16,10 +16,12 @@ spec:
       values: |
         operator:
           enableCRD: true
-          webhook:
-            enabled: false
         crds:
           enabled: true
+        webhook:
+          enabled: false
+        admissionWebhooks:
+          enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: victoriametrics
