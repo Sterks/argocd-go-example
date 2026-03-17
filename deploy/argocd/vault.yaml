@@ -8,13 +8,13 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://helm.releases.hashicorp.com
-    chart: vault
-    targetRevision: 0.32.0
+    repoURL: https://github.com/Sterks/argocd-go-example.git
+    targetRevision: HEAD
+    path: deploy/argocd/charts/vault
     helm:
       releaseName: vault
       valueFiles:
-        - vault-values.yaml
+        - ../../vault-values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: vault
