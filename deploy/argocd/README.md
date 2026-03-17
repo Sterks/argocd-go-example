@@ -14,7 +14,7 @@
 HashiCorp Vault в режиме HA с Raft storage backend.
 - **Namespace:** `vault`
 - **Chart:** `vault` из репозитория HashiCorp
-- **Version:** 0.29.0
+- **Version:** 0.32.0 (Vault 1.21.2)
 - **Replicas:** 3 (HA режим)
 - **Ingress:** `vault.techbit.su`
 

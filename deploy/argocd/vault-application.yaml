@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://helm.releases.hashicorp.com
     chart: vault
-    targetRevision: 0.29.0
+    targetRevision: 0.32.0
     helm:
       values: |
         # HashiCorp Vault Helm Chart Values
