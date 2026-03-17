@@ -10,14 +10,15 @@ spec:
   source:
     repoURL: https://github.com/Sterks/argocd-go-example.git
     targetRevision: HEAD
-    path: deploy/argocd/app
+    path: deploy/argocd
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: argocd-go-example
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
+      - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
