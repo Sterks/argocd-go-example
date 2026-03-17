@@ -13,31 +13,20 @@
 ### 2. vault
 HashiCorp Vault в режиме HA с Raft storage backend.
 - **Namespace:** `vault`
-- **Chart:** `vault` из репозитория HashiCorp
-- **Version:** 0.32.0 (Vault 1.21.2)
+- **Source:** локальный репозиторий (`deploy/vault/`)
 - **Replicas:** 3 (HA режим)
 - **Ingress:** `vault.techbit.su`
+- **Файл:** `vault.yaml`
 
-> **Примечание:** Если ArgoCD не может синхронизировать Vault из-за недоступности Helm репозитория HashiCorp (403 Forbidden), Vault можно установить вручную:
-> ```bash
-> helm repo add hashicorp https://helm.releases.hashicorp.com
-> helm install vault hashicorp/vault -f deploy/vault/values.yaml -n vault --create-namespace
-> ```
-
-### 3. victoria-metrics
-VictoriaMetrics Operator для управления CRD.
-- **Namespace:** `victoriametrics`
-- **Chart:** `victoria-metrics-operator` из репозитория VictoriaMetrics
-- **Version:** 0.29.0
-
-### 4. victoria-metrics-cluster
-Кластер VictoriaMetrics (VMCluster).
+### 3. victoriametrics
+VictoriaMetrics Operator и VMCluster.
 - **Namespace:** `victoriametrics`
 - **Source:** локальный репозиторий (`deploy/victoriametrics/`)
 - **Компоненты:**
   - vminsert: 2 реплики (запись данных)
   - vmselect: 2 реплики (чтение данных)
   - vmstorage: 1 реплика (хранение данных)
+- **Файл:** `victoriametrics.yaml`
 
 ## Быстрый старт
 
@@ -57,8 +46,7 @@ kubectl get applications -n argocd
 
 ```bash
 argocd app sync vault
-argocd app sync victoria-metrics
-argocd app sync victoria-metrics-cluster
+argocd app sync victoriametrics
 ```
 
 ## Доступ к VictoriaMetrics
