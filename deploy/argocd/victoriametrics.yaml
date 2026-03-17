@@ -16,6 +16,8 @@ spec:
       values: |
         operator:
           enableCRD: true
+          webhook:
+            enabled: false
         crds:
           enabled: true
   destination:
