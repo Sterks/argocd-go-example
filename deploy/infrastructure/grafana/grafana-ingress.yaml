@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana
+  namespace: victoriametrics
+  labels:
+    app: grafana
+  annotations:
+    # Whitelist IP адресов - только внутренняя сеть
+    # Формат: comma-separated list (не newlines!)
+    nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.0.0/24,10.42.0.0/16"
+    # Backend protocol - Grafana использует HTTP внутри кластера
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    # Use-proxy-protocol для корректной передачи протокола
+    nginx.ingress.kubernetes.io/use-proxy-protocol: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    # Rule for IP-based access with /grafana path
+    - http:
+        paths:
+          - path: /grafana
+            pathType: Prefix
+            backend:
+              service:
+                name: vm-stack-2-grafana
+                port:
+                  number: 80
