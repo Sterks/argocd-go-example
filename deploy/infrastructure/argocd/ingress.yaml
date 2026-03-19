@@ -7,14 +7,15 @@ metadata:
     app: argocd
   annotations:
     # Whitelist IP адресов - только внутренняя сеть
-    # Формат: comma-separated list (не newlines!)
-    nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.0.0/24,10.42.0.0/16"
-    # Backend protocol - ArgoCD server использует HTTP внутри кластера
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-    # Use-proxy-protocol для корректной передачи протокола
-    nginx.ingress.kubernetes.io/use-proxy-protocol: "true"
+    envoy.ingress.kubernetes.io/whitelist: |
+      192.168.0.0/24
+      10.42.0.0/16
+    # Rate limiting (запросов в секунду на IP)
+    envoy.ingress.kubernetes.io/rate-limit: "100"
+    # Timeout
+    envoy.ingress.kubernetes.io/timeout: "30s"
 spec:
-  ingressClassName: nginx
+  ingressClassName: envoy
   # Default backend - works for IP-based access
   defaultBackend:
     service:
