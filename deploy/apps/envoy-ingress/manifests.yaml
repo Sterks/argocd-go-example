@@ -47,7 +47,7 @@ data:
                       name: local_route
                       virtual_hosts:
                         - name: go_app
-                          domains: ["argocd-go-example.local", "*"]
+                          domains: ["argocd-go-example.local"]
                           routes:
                             - match:
                                 path: "/"
@@ -65,7 +65,25 @@ data:
                                 prefix: "/"
                               route:
                                 cluster: vault_cluster
-        
+                        - name: grafana
+                          domains: ["grafana.local"]
+                          routes:
+                            - match:
+                                prefix: "/"
+                              route:
+                                cluster: grafana_cluster
+                        - name: grafana_path
+                          domains: ["*"]
+                          routes:
+                            - match:
+                                prefix: "/grafana"
+                              route:
+                                cluster: grafana_cluster
+                            - match:
+                                prefix: "/"
+                              route:
+                                cluster: go_app_cluster
+
         - name: listener_https
           address:
             socket_address:
@@ -99,7 +117,7 @@ data:
                       name: local_route_https
                       virtual_hosts:
                         - name: go_app_https
-                          domains: ["argocd-go-example.local", "*"]
+                          domains: ["argocd-go-example.local"]
                           routes:
                             - match:
                                 path: "/"
@@ -116,7 +134,25 @@ data:
                                 prefix: "/"
                               route:
                                 cluster: vault_cluster
-      
+                        - name: grafana_https
+                          domains: ["grafana.local"]
+                          routes:
+                            - match:
+                                prefix: "/"
+                              route:
+                                cluster: grafana_cluster
+                        - name: grafana_path_https
+                          domains: ["*"]
+                          routes:
+                            - match:
+                                prefix: "/grafana"
+                              route:
+                                cluster: grafana_cluster
+                            - match:
+                                prefix: "/"
+                              route:
+                                cluster: go_app_cluster
+
       clusters:
         - name: go_app_cluster
           type: STRICT_DNS
@@ -144,6 +180,20 @@ data:
                         socket_address:
                           address: vault.vault.svc.cluster.local
                           port_value: 8200
+          connect_timeout: 5s
+
+        - name: grafana_cluster
+          type: STRICT_DNS
+          lb_policy: ROUND_ROBIN
+          load_assignment:
+            cluster_name: grafana_cluster
+            endpoints:
+              - lb_endpoints:
+                  - endpoint:
+                      address:
+                        socket_address:
+                          address: vm-stack-2-grafana.victoriametrics.svc.cluster.local
+                          port_value: 80
           connect_timeout: 5s
 ---
 apiVersion: apps/v1
