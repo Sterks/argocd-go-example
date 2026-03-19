@@ -27,3 +27,14 @@ spec:
                 name: vm-stack-2-grafana
                 port:
                   number: 80
+    # Host-based rule for DNS access
+    - host: grafana.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vm-stack-2-grafana
+                port:
+                  number: 80
