@@ -11,10 +11,8 @@ metadata:
     nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.0.0/24,10.42.0.0/16"
     # Backend protocol - ArgoCD server использует HTTP внутри кластера
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-    # Сообщаем ArgoCD что оригинальный запрос был HTTPS (для корректных редиректов)
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_set_header X-Forwarded-Proto https;
-      proxy_set_header X-Forwarded-Scheme https;
+    # Use-proxy-protocol для корректной передачи протокола
+    nginx.ingress.kubernetes.io/use-proxy-protocol: "true"
 spec:
   ingressClassName: nginx
   # Default backend - works for IP-based access
