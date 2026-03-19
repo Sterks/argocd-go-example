@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-go-example
+  namespace: argocd-go-example
+  labels:
+    app: argocd-go-example
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: argocd-go-example
+  template:
+    metadata:
+      labels:
+        app: argocd-go-example
+    spec:
+      containers:
+        - name: app
+          image: 192.168.0.101:30500/argocd-go-example:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

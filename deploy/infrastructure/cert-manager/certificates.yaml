@@ -1,0 +1,49 @@
+# Self-signed ClusterIssuer для локальных сертификатов
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned
+spec:
+  selfSigned: {}
+---
+# TLS сертификат для Go приложения
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: argocd-go-example-tls
+  namespace: argocd-go-example
+spec:
+  secretName: argocd-go-example-tls
+  duration: 8760h  # 1 год
+  renewBefore: 720h  # 30 дней до истечения
+  subject:
+    organizations:
+      - argocd-go-example
+  commonName: argocd-go-example.local
+  dnsNames:
+    - argocd-go-example.local
+    - "*.argocd-go-example.local"
+  issuerRef:
+    name: selfsigned
+    kind: ClusterIssuer
+---
+# TLS сертификат для Vault
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vault-tls
+  namespace: vault
+spec:
+  secretName: vault-tls
+  duration: 8760h
+  renewBefore: 720h
+  subject:
+    organizations:
+      - vault
+  commonName: vault.techbit.su
+  dnsNames:
+    - vault.techbit.su
+    - "*.vault.techbit.su"
+  issuerRef:
+    name: selfsigned
+    kind: ClusterIssuer

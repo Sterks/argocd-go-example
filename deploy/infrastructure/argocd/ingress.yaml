@@ -1,0 +1,47 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-server
+  namespace: argocd
+  labels:
+    app: argocd
+  annotations:
+    # Whitelist IP адресов - только внутренняя сеть
+    # Формат: comma-separated list (не newlines!)
+    nginx.ingress.kubernetes.io/whitelist-source-range: "192.168.0.0/24,10.42.0.0/16"
+    # Backend protocol - ArgoCD server использует HTTP внутри кластера
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    # Сообщаем ArgoCD что оригинальный запрос был HTTPS (для корректных редиректов)
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header X-Forwarded-Proto https;
+      proxy_set_header X-Forwarded-Scheme https;
+spec:
+  ingressClassName: nginx
+  # Default backend - works for IP-based access
+  defaultBackend:
+    service:
+      name: argocd-server
+      port:
+        number: 80
+  rules:
+    # Catch-all rule for IP-based access (any host)
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 80
+    # Host-based rule (optional, for DNS access)
+    - host: argocd.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 80
