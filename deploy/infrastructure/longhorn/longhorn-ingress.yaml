@@ -1,10 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: grafana
-  namespace: victoriametrics
+  name: longhorn-ingress
+  namespace: longhorn-system
   labels:
-    app: grafana
+    app: longhorn
   annotations:
     # Whitelist IP адресов - только внутренняя сеть
     envoy.ingress.kubernetes.io/whitelist: |
@@ -18,23 +18,13 @@ spec:
   ingressClassName: envoy
   rules:
     # Host-based rule for DNS access
-    - host: grafana.techbit.su
+    - host: longhorn.techbit.su
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: vm-stack-2-grafana
-                port:
-                  number: 80
-    # IP-based rule for direct access
-    - http:
-        paths:
-          - path: /grafana
-            pathType: Prefix
-            backend:
-              service:
-                name: vm-stack-2-grafana
+                name: longhorn-frontend
                 port:
                   number: 80

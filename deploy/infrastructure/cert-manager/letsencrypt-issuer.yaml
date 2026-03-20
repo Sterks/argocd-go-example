@@ -1,0 +1,15 @@
+# Let's Encrypt Production ClusterIssuer для Envoy
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod-envoy
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: runov.denis@yandex.ru
+    privateKeySecretRef:
+      name: letsencrypt-prod-envoy-account-key
+    solvers:
+    - http01:
+        ingress:
+          class: envoy

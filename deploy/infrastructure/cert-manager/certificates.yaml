@@ -6,7 +6,7 @@ metadata:
 spec:
   selfSigned: {}
 ---
-# TLS сертификат для Go приложения
+# TLS сертификат для Go приложения (Let's Encrypt)
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -14,20 +14,19 @@ metadata:
   namespace: argocd-go-example
 spec:
   secretName: argocd-go-example-tls
-  duration: 8760h  # 1 год
-  renewBefore: 720h  # 30 дней до истечения
+  duration: 2160h  # 90 дней
+  renewBefore: 360h  # 15 дней до истечения
   subject:
     organizations:
       - argocd-go-example
-  commonName: argocd-go-example.local
+  commonName: app.techbit.su
   dnsNames:
-    - argocd-go-example.local
-    - "*.argocd-go-example.local"
+    - app.techbit.su
   issuerRef:
-    name: selfsigned
+    name: letsencrypt-prod-envoy
     kind: ClusterIssuer
 ---
-# TLS сертификат для Vault
+# TLS сертификат для Vault (Let's Encrypt)
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -35,15 +34,14 @@ metadata:
   namespace: vault
 spec:
   secretName: vault-tls
-  duration: 8760h
-  renewBefore: 720h
+  duration: 2160h
+  renewBefore: 360h
   subject:
     organizations:
       - vault
   commonName: vault.techbit.su
   dnsNames:
     - vault.techbit.su
-    - "*.vault.techbit.su"
   issuerRef:
-    name: selfsigned
+    name: letsencrypt-prod-envoy
     kind: ClusterIssuer

@@ -1,0 +1,23 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: envoy-gateway-tls
+  namespace: default
+spec:
+  secretName: envoy-gateway-tls-secret
+  duration: 2160h # 90 дней
+  renewBefore: 360h # 15 дней до истечения
+  subject:
+    organizations:
+      - argocd-go-example
+  commonName: argocd.techbit.su
+  dnsNames:
+    - argocd.techbit.su
+    - grafana.techbit.su
+    - longhorn.techbit.su
+    - vault.techbit.su
+    - app.techbit.su
+  issuerRef:
+    name: letsencrypt-prod-envoy
+    kind: ClusterIssuer
+    group: cert-manager.io
