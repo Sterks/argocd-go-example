@@ -4,7 +4,7 @@ metadata:
   name: vault-agent-template
   namespace: argocd-go-example
 data:
-  config.env: |
+  config.env.tmpl: |
     {{- with secret "kv/go-app/config" -}}
     DB_HOST={{ index .Data "DB_HOST" }}
     DB_PORT={{ index .Data "DB_PORT" }}
