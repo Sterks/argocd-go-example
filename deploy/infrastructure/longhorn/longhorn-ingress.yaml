@@ -14,14 +14,15 @@ metadata:
     envoy.ingress.kubernetes.io/rate-limit: "100"
     # Timeout
     envoy.ingress.kubernetes.io/timeout: "30s"
+    # URL Rewrite для path-based доступа
+    envoy.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: envoy
   rules:
-    # Host-based rule for DNS access
-    - host: longhorn.techbit.su
-      http:
+    # Path-based access: https://192.168.0.200/longhorn
+    - http:
         paths:
-          - path: /
+          - path: /longhorn
             pathType: Prefix
             backend:
               service:
