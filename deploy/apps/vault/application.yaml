@@ -8,13 +8,29 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/Sterks/argocd-go-example.git
-    targetRevision: HEAD
-    path: deploy/argocd/charts/vault
+    repoURL: https://helm.releases.hashicorp.com
+    chart: vault
+    targetRevision: 0.29.1
     helm:
       releaseName: vault
-      valueFiles:
-        - ../../vault-values.yaml
+      values: |
+        server:
+          env:
+            - name: VAULT_LOCAL_CONFIG
+              value: |
+                ui = true
+                ui_url = "https://192.168.0.200/vault"
+                listener "tcp" {
+                  tls_disable = 1
+                  address = "[::]:8200"
+                  cluster_address = "[::]:8201"
+                }
+                storage "raft" {
+                  path = "/vault/data"
+                }
+                service_registration "kubernetes" {
+                  namespace = "vault"
+                }
   destination:
     server: https://kubernetes.default.svc
     namespace: vault

@@ -14,7 +14,23 @@ spec:
     metadata:
       labels:
         app: argocd-go-example
+      annotations:
+        # Vault Agent Injector annotations
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret: "config.env"
+        vault.hashicorp.com/agent-pre-populate-only: "true"
+        vault.hashicorp.com/role: "go-app-role"
+        vault.hashicorp.com/agent-inject-template: |
+          {{- with secret "kv/go-app/config" -}}
+          DB_HOST={{ index .Data "DB_HOST" }}
+          DB_PORT={{ index .Data "DB_PORT" }}
+          DB_NAME={{ index .Data "DB_NAME" }}
+          DB_USER={{ index .Data "DB_USER" }}
+          DB_PASSWORD={{ index .Data "DB_PASSWORD" }}
+          API_KEY={{ index .Data "API_KEY" }}
+          {{- end }}
     spec:
+      serviceAccountName: vault-auth
       containers:
         - name: app
           image: 192.168.0.101:30500/argocd-go-example:latest
@@ -22,6 +38,43 @@ spec:
           ports:
             - containerPort: 8080
               name: http
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: vault-go-app-config
+                  key: DB_HOST
+                  optional: true
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: vault-go-app-config
+                  key: DB_PORT
+                  optional: true
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: vault-go-app-config
+                  key: DB_NAME
+                  optional: true
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: vault-go-app-config
+                  key: DB_USER
+                  optional: true
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vault-go-app-config
+                  key: DB_PASSWORD
+                  optional: true
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vault-go-app-config
+                  key: API_KEY
+                  optional: true
           livenessProbe:
             httpGet:
               path: /health
@@ -41,3 +94,14 @@ spec:
             limits:
               cpu: 200m
               memory: 256Mi
+          volumeMounts:
+            - name: vault-secrets
+              mountPath: /vault/secrets
+              readOnly: true
+      volumes:
+        - name: vault-secrets
+          projected:
+            sources:
+              - secret:
+                  name: vault-go-app-config
+                  optional: true

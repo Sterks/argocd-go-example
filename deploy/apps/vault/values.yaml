@@ -37,6 +37,7 @@ server:
     - name: VAULT_LOCAL_CONFIG
       value: |
         ui = true
+        ui_url = "https://192.168.0.200/vault"
         listener "tcp" {
           tls_disable = 1
           address = "[::]:8200"
