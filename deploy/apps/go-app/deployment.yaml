@@ -18,7 +18,6 @@ spec:
         # Vault Agent Injector annotations
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-inject-secret: "config.json"
-        vault.hashicorp.com/agent-pre-populate-only: "true"
         vault.hashicorp.com/role: "go-app-role"
     spec:
       serviceAccountName: vault-auth
