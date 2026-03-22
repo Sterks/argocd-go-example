@@ -4,29 +4,12 @@ metadata:
   name: vault-agent-template
   namespace: argocd-go-example
 data:
-  config.hcl: |
-    vault {
-      address = "https://192.168.0.200/vault"
-      ca_cert = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-    }
-    
-    auth {
-      path = "auth/kubernetes"
-      mount_path = "auth/kubernetes"
-      method = "kubernetes"
-      role = "go-app-role"
-    }
-    
-    template {
-      destination = "/vault/secrets/config.env"
-      contents = """
-      {{- with secret "kv/go-app/config" -}}
-      DB_HOST={{ index .Data "DB_HOST" }}
-      DB_PORT={{ index .Data "DB_PORT" }}
-      DB_NAME={{ index .Data "DB_NAME" }}
-      DB_USER={{ index .Data "DB_USER" }}
-      DB_PASSWORD={{ index .Data "DB_PASSWORD" }}
-      API_KEY={{ index .Data "API_KEY" }}
-      {{- end }}
-      """
-    }
+  config.env: |
+    {{- with secret "kv/go-app/config" -}}
+    DB_HOST={{ index .Data "DB_HOST" }}
+    DB_PORT={{ index .Data "DB_PORT" }}
+    DB_NAME={{ index .Data "DB_NAME" }}
+    DB_USER={{ index .Data "DB_USER" }}
+    DB_PASSWORD={{ index .Data "DB_PASSWORD" }}
+    API_KEY={{ index .Data "API_KEY" }}
+    {{- end }}
