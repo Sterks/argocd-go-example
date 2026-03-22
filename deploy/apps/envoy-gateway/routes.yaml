@@ -1,3 +1,24 @@
+# =============================================================================
+# Envoy Gateway HTTP Routes
+# =============================================================================
+# Маршруты для доступа к сервисам через Envoy Gateway
+# 
+# Доступные эндпоинты:
+#   - https://techbit.su/argocd/     → ArgoCD
+#   - https://techbit.su/grafana/    → Grafana
+#   - https://techbit.su/longhorn/   → Longhorn
+#   - https://techbit.su/vault/ui/   → Vault UI
+#   - https://techbit.su/            → Go App (главная)
+#
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Grafana Route
+# -----------------------------------------------------------------------------
+# URL: https://techbit.su/grafana/
+# Перенаправление: /grafana/* → Grafana Service (порт 3000)
+# Namespace: victoriametrics
+# -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -13,17 +34,29 @@ spec:
       namespace: default
       sectionName: https
       port: 443
-  hostnames:
-    - grafana.techbit.su
   rules:
     - matches:
         - path:
             type: PathPrefix
-            value: /
+            value: /grafana
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
       backendRefs:
         - name: vm-stack-2-grafana
           port: 80
 ---
+# -----------------------------------------------------------------------------
+# ArgoCD Route
+# -----------------------------------------------------------------------------
+# URL: https://techbit.su/argocd/
+# Перенаправление: /argocd/* → ArgoCD Server (порт 80)
+# Namespace: argocd
+# Примечание: ArgoCD требует настройки base href для работы с подпутём
+# -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -39,17 +72,28 @@ spec:
       namespace: default
       sectionName: https
       port: 443
-  hostnames:
-    - argocd.techbit.su
   rules:
     - matches:
         - path:
             type: PathPrefix
-            value: /
+            value: /argocd
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
       backendRefs:
         - name: argocd-server
           port: 80
 ---
+# -----------------------------------------------------------------------------
+# Longhorn Route
+# -----------------------------------------------------------------------------
+# URL: https://techbit.su/longhorn/
+# Перенаправление: /longhorn/* → Longhorn Frontend (порт 80)
+# Namespace: longhorn-system
+# -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -80,6 +124,16 @@ spec:
         - name: longhorn-frontend
           port: 80
 ---
+# -----------------------------------------------------------------------------
+# Vault Route
+# -----------------------------------------------------------------------------
+# URL: https://techbit.su/vault/ui/
+# Перенаправление: 
+#   - /vault/* → Vault UI (порт 8200)
+#   - /ui/* → Vault UI статика (CSS, JS)
+#   - /v1/* → Vault API (для работы UI)
+# Namespace: vault
+# -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -139,6 +193,13 @@ spec:
         - name: vault-ui
           port: 8200
 ---
+# -----------------------------------------------------------------------------
+# Go App Route (Главная страница)
+# -----------------------------------------------------------------------------
+# URL: https://techbit.su/
+# Перенаправление: /* → Go App Service (порт 8080)
+# Namespace: argocd-go-example
+# -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -154,8 +215,6 @@ spec:
       namespace: default
       sectionName: https
       port: 443
-  hostnames:
-    - app.techbit.su
   rules:
     - matches:
         - path:

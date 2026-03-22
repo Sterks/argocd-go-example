@@ -7,8 +7,9 @@ spec:
   secretName: envoy-gateway-tls-secret
   duration: 8760h # 1 год
   renewBefore: 720h # 30 дней до истечения
-  commonName: "*.techbit.su"
+  commonName: "techbit.su"
   dnsNames:
+    - "techbit.su"
     - "*.techbit.su"
     - argocd.techbit.su
     - grafana.techbit.su
