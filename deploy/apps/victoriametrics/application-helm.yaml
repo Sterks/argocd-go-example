@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vm-stack
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://victoriametrics.github.io/helm-charts
+    chart: victoria-metrics-k8s-stack
+    targetRevision: 0.35.0
+    helm:
+      releaseName: vm-stack
+      values: |
+        operator:
+          enabled: true
+          createCRDs: true
+
+        kube-state-metrics:
+          enabled: true
+
+        prometheus-node-exporter:
+          enabled: true
+
+        victoria-metrics-operator:
+          createCRDs: true
+
+        victoria-metrics-single:
+          enabled: false
+
+        victoria-metrics-cluster:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: victoriametrics
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
