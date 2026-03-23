@@ -116,6 +116,9 @@ spec:
       labels:
         app: pritunl
     spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
       containers:
         - name: pritunl
           image: docker.io/jippi/pritunl:1.32.4567.52
@@ -128,10 +131,6 @@ spec:
             - containerPort: 443
               name: https
           env:
-            - name: PUID
-              value: "1000"
-            - name: PGID
-              value: "1000"
             - name: TZ
               value: "Europe/Moscow"
             - name: PRITUNL_MONGODB_URI
@@ -140,19 +139,17 @@ spec:
               value: "true"
             - name: PRITUNL_APP_URL
               value: "http://pritunl.pritunl.svc.cluster.local"
+            - name: PRITUNL_HTTP_PORT
+              value: "80"
           livenessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /health
+            tcpSocket:
               port: 80
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /health
+            tcpSocket:
               port: 80
             initialDelaySeconds: 10
             periodSeconds: 5
@@ -161,11 +158,17 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /var/lib/pritunl
+            - name: dev
+              mountPath: /dev
           securityContext:
+            privileged: true
             capabilities:
               add:
                 - NET_ADMIN
                 - SYS_MODULE
+                - NET_RAW
+                - SETUID
+                - SETGID
           resources:
             requests:
               cpu: 100m
@@ -177,6 +180,10 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: pritunl-data
+        - name: dev
+          hostPath:
+            path: /dev
+            type: Directory
 ---
 apiVersion: v1
 kind: Service
@@ -211,9 +218,13 @@ metadata:
     app: pritunl
 spec:
   type: LoadBalancer
+  loadBalancerIP: 192.18.0.200
+  externalIPs:
+    - 192.18.0.200
+    - 192.168.0.202
   ports:
-    - port: 1194
-      targetPort: 1194
+    - port: 18489
+      targetPort: 18489
       protocol: UDP
       name: openvpn
   selector:

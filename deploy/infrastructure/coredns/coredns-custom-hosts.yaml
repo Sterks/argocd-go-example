@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: kube-system
+data:
+  NodeHosts: |
+    192.168.0.101 node1
+    192.168.0.102 node2
+    192.168.0.103 node3
+    192.168.0.104 node4
+    192.168.0.105 node5
+    192.168.0.106 node6
+    # Envoy Gateway - основной шлюз
+    192.168.0.200 envoy-gateway.techbit.su envoy-gateway.internal
+    192.168.0.200 eg.techbit.su eg.internal
+    # Grafana - доступ через Envoy Gateway
+    192.168.0.200 grafana.techbit.su grafana.internal
+    # Pritunl VPN - веб интерфейс
+    192.168.0.200 pritunl.techbit.su pritunl.internal
+    # ArgoCD - доступ через Envoy Gateway
+    192.168.0.200 argocd.techbit.su argocd.internal
+    # Vault - доступ через Envoy Gateway
+    192.168.0.200 vault.techbit.su vault.internal
+    # Longhorn - доступ через Envoy Gateway
+    192.168.0.200 longhorn.techbit.su longhorn.internal
+    # VictoriaMetrics компоненты
+    10.43.38.145 vminsert.techbit.su vminsert.internal
+    10.43.112.27 vmselect.techbit.su vmselect.internal
+    # Kubernetes API
+    10.43.0.1 kubernetes.techbit.su k8s.internal

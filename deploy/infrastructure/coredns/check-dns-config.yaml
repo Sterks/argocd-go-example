@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: check-dns-config
+  namespace: kube-system
+spec:
+  restartPolicy: Never
+  containers:
+  - name: check
+    image: alpine:latest
+    command: ["sh", "-c", "ls -la /etc/coredns/custom/ && cat /etc/coredns/custom/*"]
+    volumeMounts:
+    - name: custom-config-volume
+      mountPath: /etc/coredns/custom
+      readOnly: true
+  volumes:
+  - name: custom-config-volume
+    configMap:
+      name: coredns-custom

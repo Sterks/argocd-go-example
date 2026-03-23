@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/Sterks/argocd-go-example.git
     targetRevision: HEAD
-    path: deploy/victoriametrics
+    path: deploy/apps/victoriametrics
   destination:
     server: https://kubernetes.default.svc
     namespace: victoriametrics

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cleanup-vmsingle
+  namespace: victoriametrics
+spec:
+  restartPolicy: Never
+  containers:
+  - name: cleanup
+    image: alpine:latest
+    command: ["sh", "-c", "rm -rf /data/* && echo 'Data cleaned successfully'"]
+    volumeMounts:
+    - name: vmsingle-data
+      mountPath: /data
+  volumes:
+  - name: vmsingle-data
+    persistentVolumeClaim:
+      claimName: vmsingle-vm-stack-2-victoria-metrics-k8s-stack
