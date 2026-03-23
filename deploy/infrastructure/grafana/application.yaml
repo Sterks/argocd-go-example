@@ -13,7 +13,7 @@ spec:
     path: deploy/infrastructure/grafana
   destination:
     server: https://kubernetes.default.svc
-    namespace: grafana
+    namespace: victoriametrics
   syncPolicy:
     automated:
       prune: true
