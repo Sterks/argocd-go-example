@@ -22,3 +22,24 @@ spec:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
+  ignoreDifferences:
+    - group: operator.victoriametrics.com
+      kind: VMCluster
+      jsonPointers:
+        - /spec
+    - group: operator.victoriametrics.com
+      kind: VMSingle
+      jsonPointers:
+        - /spec
+    - group: operator.victoriametrics.com
+      kind: VMAgent
+      jsonPointers:
+        - /spec
+    - group: operator.victoriametrics.com
+      kind: VMAlert
+      jsonPointers:
+        - /spec
+    - group: operator.victoriametrics.com
+      kind: VMAlertmanager
+      jsonPointers:
+        - /spec
