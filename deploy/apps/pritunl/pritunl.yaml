@@ -8,22 +8,6 @@
 # 3. Настройте пользователей и подключения
 # =============================================================================
 
----
-# MongoDB для Pritunl
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mongodb-data
-  namespace: pritunl
-  labels:
-    app: mongodb
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
