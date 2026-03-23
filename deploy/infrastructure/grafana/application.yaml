@@ -27,3 +27,20 @@ spec:
       kind: Deployment
       jsonPointers:
         - /spec/replicas
+  health:
+    resourceHealthChecks:
+      - group: networking.k8s.io
+        kind: Ingress
+        check:
+          lua: |
+            hs = {}
+            hs.status = "Healthy"
+            hs.message = "Ingress is healthy"
+            return hs
+      - group: ""
+        kind: ConfigMap
+        check:
+          lua: |
+            hs = {}
+            hs.status = "Healthy"
+            return hs

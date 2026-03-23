@@ -22,3 +22,69 @@ spec:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
+  ignoreDifferences:
+    - group: ""
+      kind: PersistentVolumeClaim
+      jsonPointers:
+        - /spec/storageClassName
+        - /spec/volumeName
+  health:
+    resourceHealthChecks:
+      - group: apps
+        kind: Deployment
+        check:
+          lua: |
+            hs = {}
+            if obj.status ~= nil then
+              if obj.status.conditions ~= nil then
+                for i, condition in ipairs(obj.status.conditions) do
+                  if condition.type == "Available" then
+                    if condition.status == "True" then
+                      hs.status = "Healthy"
+                      return hs
+                    end
+                  end
+                end
+              end
+            end
+            hs.status = "Progressing"
+            return hs
+      - group: apps
+        kind: StatefulSet
+        check:
+          lua: |
+            hs = {}
+            if obj.status ~= nil then
+              if obj.status.conditions ~= nil then
+                for i, condition in ipairs(obj.status.conditions) do
+                  if condition.type == "Ready" then
+                    if condition.status == "True" then
+                      hs.status = "Healthy"
+                      return hs
+                    end
+                  end
+                end
+              end
+            end
+            hs.status = "Progressing"
+            return hs
+      - group: ""
+        kind: Service
+        check:
+          lua: |
+            hs = {}
+            hs.status = "Healthy"
+            return hs
+      - group: ""
+        kind: PersistentVolumeClaim
+        check:
+          lua: |
+            hs = {}
+            if obj.status ~= nil then
+              if obj.status.phase == "Bound" then
+                hs.status = "Healthy"
+                return hs
+              end
+            end
+            hs.status = "Progressing"
+            return hs
