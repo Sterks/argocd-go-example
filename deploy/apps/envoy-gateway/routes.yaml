@@ -2,12 +2,12 @@
 # Envoy Gateway HTTP Routes
 # =============================================================================
 # Маршруты для доступа к сервисам через Envoy Gateway
-# 
-# Доступные эндпоинты:
-#   - https://techbit.su/argocd/     → ArgoCD
-#   - https://techbit.su/grafana/    → Grafana
-#   - https://techbit.su/longhorn/   → Longhorn
-#   - https://techbit.su/vault/ui/   → Vault UI
+#
+# Доступные эндпоинты (поддомены):
+#   - https://argocd.techbit.su/     → ArgoCD
+#   - https://grafana.techbit.su/    → Grafana
+#   - https://longhorn.techbit.su/   → Longhorn
+#   - https://vault.techbit.su/      → Vault UI
 #   - https://techbit.su/            → Go App (главная)
 #
 # =============================================================================
@@ -15,8 +15,8 @@
 # -----------------------------------------------------------------------------
 # Grafana Route
 # -----------------------------------------------------------------------------
-# URL: https://techbit.su/grafana/
-# Перенаправление: /grafana/* → Grafana Service (порт 3000)
+# URL: https://grafana.techbit.su/
+# Backend: Grafana Service (порт 3000)
 # Namespace: victoriametrics
 # -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
@@ -34,17 +34,13 @@ spec:
       namespace: default
       sectionName: https
       port: 443
+  hostnames:
+    - grafana.techbit.su
   rules:
     - matches:
         - path:
             type: PathPrefix
-            value: /grafana
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /
+            value: /
       backendRefs:
         - name: vm-stack-2-grafana
           port: 80
@@ -52,10 +48,10 @@ spec:
 # -----------------------------------------------------------------------------
 # ArgoCD Route
 # -----------------------------------------------------------------------------
-# URL: https://techbit.su/argocd/
-# Перенаправление: /argocd/* → ArgoCD Server (порт 80)
+# URL: https://argocd.techbit.su/
+# Backend: ArgoCD Server (порт 80)
 # Namespace: argocd
-# Примечание: ArgoCD требует настройки base href для работы с подпутём
+# Примечание: ArgoCD требует доступ с корневого пути, поэтому используем поддомен
 # -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -72,17 +68,13 @@ spec:
       namespace: default
       sectionName: https
       port: 443
+  hostnames:
+    - argocd.techbit.su
   rules:
     - matches:
         - path:
             type: PathPrefix
-            value: /argocd
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /
+            value: /
       backendRefs:
         - name: argocd-server
           port: 80
@@ -90,8 +82,8 @@ spec:
 # -----------------------------------------------------------------------------
 # Longhorn Route
 # -----------------------------------------------------------------------------
-# URL: https://techbit.su/longhorn/
-# Перенаправление: /longhorn/* → Longhorn Frontend (порт 80)
+# URL: https://longhorn.techbit.su/
+# Backend: Longhorn Frontend (порт 80)
 # Namespace: longhorn-system
 # -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
@@ -109,17 +101,13 @@ spec:
       namespace: default
       sectionName: https
       port: 443
+  hostnames:
+    - longhorn.techbit.su
   rules:
     - matches:
         - path:
             type: PathPrefix
-            value: /longhorn
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /
+            value: /
       backendRefs:
         - name: longhorn-frontend
           port: 80
@@ -127,12 +115,10 @@ spec:
 # -----------------------------------------------------------------------------
 # Vault Route
 # -----------------------------------------------------------------------------
-# URL: https://techbit.su/vault/ui/
-# Перенаправление: 
-#   - /vault/* → Vault UI (порт 8200)
-#   - /ui/* → Vault UI статика (CSS, JS)
-#   - /v1/* → Vault API (для работы UI)
+# URL: https://vault.techbit.su/
+# Backend: Vault UI (порт 8200)
 # Namespace: vault
+# Примечание: Маршрут обрабатывает все пути для работы UI
 # -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -149,46 +135,13 @@ spec:
       namespace: default
       sectionName: https
       port: 443
+  hostnames:
+    - vault.techbit.su
   rules:
-    # /vault → Vault UI с URL Rewrite
     - matches:
         - path:
             type: PathPrefix
-            value: /vault
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /
-      backendRefs:
-        - name: vault-ui
-          port: 8200
-    # /ui/* → Vault UI (для статических ресурсов)
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /ui
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /ui
-      backendRefs:
-        - name: vault-ui
-          port: 8200
-    # /v1/* → Vault API (для работы UI)
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /v1
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /v1
+            value: /
       backendRefs:
         - name: vault-ui
           port: 8200
@@ -197,7 +150,7 @@ spec:
 # Go App Route (Главная страница)
 # -----------------------------------------------------------------------------
 # URL: https://techbit.su/
-# Перенаправление: /* → Go App Service (порт 8080)
+# Backend: Go App Service (порт 8080)
 # Namespace: argocd-go-example
 # -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
@@ -215,6 +168,8 @@ spec:
       namespace: default
       sectionName: https
       port: 443
+  hostnames:
+    - techbit.su
   rules:
     - matches:
         - path:
@@ -223,3 +178,33 @@ spec:
       backendRefs:
         - name: go-app-service
           port: 8080
+---
+# -----------------------------------------------------------------------------
+# Pritunl Route (VPN Server)
+# -----------------------------------------------------------------------------
+# URL: https://vpn.techbit.su/
+# Backend: Pritunl Service (порт 80 HTTP)
+# Namespace: pritunl
+# Примечание: TLS termination на Gateway, backend получает HTTP
+# -----------------------------------------------------------------------------
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: pritunl-route
+  namespace: pritunl
+spec:
+  parentRefs:
+    - name: main-gateway
+      namespace: default
+      sectionName: https
+      port: 443
+  hostnames:
+    - vpn.techbit.su
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: pritunl
+          port: 80
