@@ -13,7 +13,6 @@
 #
 # Доступ по IP шлюза (HTTP :80, без Host или с IP в Host):
 #   - /              → Grafana (по умолчанию)
-#   - (по IP без Host — см. Ingress whitelist; удобнее зайти по имени argocd.techbit.su)
 #   - /longhorn      → Longhorn (префикс снимается на Gateway)
 #   - /vault         → Vault UI
 #   - /vpn           → Pritunl
