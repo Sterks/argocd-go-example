@@ -48,10 +48,10 @@ spec:
 # -----------------------------------------------------------------------------
 # ArgoCD Route
 # -----------------------------------------------------------------------------
-# URL: https://argocd.techbit.su/
+# URL: https://argocd.techbit.su/argocd/
 # Backend: ArgoCD Server (порт 80)
 # Namespace: argocd
-# Примечание: ArgoCD требует доступ с корневого пути, поэтому используем поддомен
+# Примечание: ArgoCD настроен с --rootpath=/argocd, поэтому путь должен быть /argocd
 # -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -74,7 +74,7 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /
+            value: /argocd
       backendRefs:
         - name: argocd-server
           port: 80

@@ -8,5 +8,6 @@ metadata:
 data:
   grafana.ini: |
     [server]
-    root_url = %(protocol)s://%(domain)s/grafana/
-    serve_from_sub_path = true
+    domain = grafana.techbit.su
+    root_url = http://grafana.techbit.su/
+    serve_from_sub_path = false
