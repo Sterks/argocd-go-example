@@ -3,30 +3,22 @@
 # =============================================================================
 # Маршруты для доступа к сервисам через Envoy Gateway
 #
-# Доступ по DNS (TLS на Gateway, порт 443):
-#   - https://argocd.techbit.su/         → ArgoCD (корень /, как в Ingress)
-#   - https://grafana.techbit.su/        → Grafana
-#   - https://longhorn.techbit.su/       → Longhorn
-#   - https://vault.techbit.su/          → Vault UI
-#   - https://vpn.techbit.su/            → Pritunl (VPN)
-#   - https://techbit.su/                → Go App (главная)
-#
-# Доступ по IP шлюза (HTTP :80, без Host или с IP в Host):
-#   - /              → Grafana (по умолчанию)
-#   - /longhorn      → Longhorn (префикс снимается на Gateway)
-#   - /vault         → Vault UI
-#   - /vpn           → Pritunl
+# Доступ по DNS (HTTP :80 и HTTPS :443):
+#   - http://argocd.techbit.su/         → ArgoCD
+#   - http://grafana.techbit.su/        → Grafana
+#   - http://longhorn.techbit.su/       → Longhorn
+#   - http://vault.techbit.su/          → Vault UI
+#   - http://vpn.techbit.su/            → Pritunl (VPN)
+#   - http://techbit.su/                → Go App (главная)
 #
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# Grafana Route (Default)
+# Grafana Route
 # -----------------------------------------------------------------------------
-# URL: http://192.168.0.202/ (по умолчанию)
+# URL: http://grafana.techbit.su/ или https://grafana.techbit.su/
 # Backend: Grafana Service (порт 3000)
 # Namespace: victoriametrics
-# Примечание: Маршрут без hostnames — default для HTTP по IP, кроме более
-#          длинных префиксов: /longhorn, /vault, /vpn
 # -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -39,25 +31,6 @@ spec:
       namespace: default
       sectionName: http
       port: 80
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
-        - name: vm-stack-2-grafana
-          port: 80
----
-# -----------------------------------------------------------------------------
-# Grafana Route (HTTPS with hostname)
-# -----------------------------------------------------------------------------
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: grafana-https-route
-  namespace: victoriametrics
-spec:
-  parentRefs:
     - name: main-gateway
       namespace: default
       sectionName: https
@@ -76,10 +49,10 @@ spec:
 # -----------------------------------------------------------------------------
 # ArgoCD Route
 # -----------------------------------------------------------------------------
-# URL: https://argocd.techbit.su/
+# URL: https://argocd.techbit.su/argocd/
 # Backend: ArgoCD Server (порт 80)
 # Namespace: argocd
-# Примечание: Путь / совпадает с deploy/infrastructure/argocd/ingress.yaml
+# Примечание: ArgoCD настроен с --rootpath=/argocd, поэтому используем путь /argocd
 # -----------------------------------------------------------------------------
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -102,96 +75,15 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /
+            value: /argocd
       backendRefs:
         - name: argocd-server
           port: 80
 ---
 # -----------------------------------------------------------------------------
-# Longhorn / Vault / Pritunl — доступ по IP (HTTP :80, префикс → / у backend)
-# -----------------------------------------------------------------------------
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: longhorn-ip-route
-  namespace: longhorn-system
-spec:
-  parentRefs:
-    - name: main-gateway
-      namespace: default
-      sectionName: http
-      port: 80
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /longhorn
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /
-      backendRefs:
-        - name: longhorn-frontend
-          port: 80
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: vault-ip-route
-  namespace: vault
-spec:
-  parentRefs:
-    - name: main-gateway
-      namespace: default
-      sectionName: http
-      port: 80
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /vault
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /
-      backendRefs:
-        - name: vault-ui
-          port: 8200
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: pritunl-ip-route
-  namespace: pritunl
-spec:
-  parentRefs:
-    - name: main-gateway
-      namespace: default
-      sectionName: http
-      port: 80
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /vpn
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /
-      backendRefs:
-        - name: pritunl
-          port: 80
----
-# -----------------------------------------------------------------------------
 # Longhorn Route
 # -----------------------------------------------------------------------------
-# URL: https://longhorn.techbit.su/
+# URL: http://longhorn.techbit.su/ или https://longhorn.techbit.su/
 # Backend: Longhorn Frontend (порт 80)
 # Namespace: longhorn-system
 # -----------------------------------------------------------------------------
@@ -307,28 +199,6 @@ spec:
       namespace: default
       sectionName: https
       port: 443
-  hostnames:
-    - vpn.techbit.su
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
-        - name: pritunl
-          port: 80
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: pritunl-http-route
-  namespace: pritunl
-spec:
-  parentRefs:
-    - name: main-gateway
-      namespace: default
-      sectionName: http
-      port: 80
   hostnames:
     - vpn.techbit.su
   rules:
