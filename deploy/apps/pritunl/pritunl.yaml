@@ -4,7 +4,7 @@
 # 
 # После установки:
 # 1. Получите ключ установки: kubectl logs -n pritunl -l app=pritunl | grep "key:"
-# 2. Откройте https://192.168.0.200/pritunl и введите ключ
+# 2. Откройте https://vpn.techbit.su/ (или https://192.168.0.200/ по имени vpn) и введите ключ
 # 3. Настройте пользователей и подключения
 # =============================================================================
 
@@ -202,9 +202,9 @@ metadata:
     app: pritunl
 spec:
   type: LoadBalancer
-  loadBalancerIP: 192.18.0.200
+  # Отдельный VIP из пула MetalLB (не 192.168.0.200 — там HTTP/HTTPS шлюза)
+  loadBalancerIP: 192.168.0.202
   externalIPs:
-    - 192.18.0.200
     - 192.168.0.202
   ports:
     - port: 18489

@@ -16,6 +16,7 @@ spec:
     - name: https
       protocol: HTTPS
       port: 443
+      hostname: "grafana.techbit.su"
       allowedRoutes:
         namespaces:
           from: All

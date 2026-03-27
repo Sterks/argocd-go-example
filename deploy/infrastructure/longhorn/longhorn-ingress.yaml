@@ -6,10 +6,6 @@ metadata:
   labels:
     app: longhorn
   annotations:
-    # Whitelist IP адресов - только внутренняя сеть
-    envoy.ingress.kubernetes.io/whitelist: |
-      192.168.0.0/24
-      10.42.0.0/16
     # Rate limiting (запросов в секунду на IP)
     envoy.ingress.kubernetes.io/rate-limit: "100"
     # Timeout
