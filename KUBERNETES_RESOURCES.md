@@ -16,7 +16,7 @@
 | `gitlab` | Active | GitLab (если используется) |
 | `grafana` | Active | Grafana (legacy) |
 | `longhorn-system` | Active | Longhorn Storage System |
-| `metallb-system` | Active | MetalLB LoadBalancer |
+| `metallb-system` | Active | k3s ServiceLB (klipper-lb) |
 | `minio-dev` | Active | MinIO Object Storage |
 | `monitoring` | Active | Monitoring Stack |
 | `ollama` | Active | Ollama AI Models |
