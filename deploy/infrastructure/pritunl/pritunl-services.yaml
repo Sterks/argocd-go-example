@@ -1,0 +1,60 @@
+# ClusterIP Service для внутреннего доступа
+apiVersion: v1
+kind: Service
+metadata:
+  name: pritunl
+  namespace: pritunl
+  labels:
+    app: pritunl
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  - port: 443
+    targetPort: 443
+    name: https
+  - port: 1194
+    targetPort: 1194
+    name: openvpn
+    protocol: UDP
+  selector:
+    app: pritunl
+---
+# NodePort Service для доступа к админке
+apiVersion: v1
+kind: Service
+metadata:
+  name: pritunl-direct
+  namespace: pritunl
+  labels:
+    app: pritunl
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 443
+    nodePort: 30443
+    name: https
+  selector:
+    app: pritunl
+---
+# LoadBalancer Service для VPN подключений
+apiVersion: v1
+kind: Service
+metadata:
+  name: pritunl-vpn
+  namespace: pritunl
+  labels:
+    app: pritunl
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 18489
+    targetPort: 1194
+    nodePort: 30218
+    name: openvpn
+    protocol: UDP
+  selector:
+    app: pritunl
