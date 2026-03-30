@@ -33,6 +33,9 @@ spec:
     sync_mode: false
     synchronous_node_count: 1
     failsafe_mode: true
+    dynamicConfiguration:
+      kubernetes:
+        bypass_api_service: false
   usersWithSecretRotation: []
   tls:
     secretName: ""
