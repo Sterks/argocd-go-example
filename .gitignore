@@ -30,3 +30,4 @@ Thumbs.db
 # Dependencies
 go.sum
 cluster-keys.json
+deploy/infrastructure/postgresql/github-secret.yaml

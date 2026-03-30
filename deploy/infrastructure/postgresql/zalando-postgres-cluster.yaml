@@ -1,0 +1,43 @@
+---
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: my-postgres-cluster
+  namespace: postgresql
+spec:
+  teamId: "myteam"
+  numberOfInstances: 2
+  users:
+    appuser:
+    - superuser
+    - createdb
+  databases:
+    appdb: appuser
+  postgresql:
+    version: "16"
+    parameters:
+      max_connections: "200"
+      shared_buffers: "256MB"
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  volume:
+    size: 100Gi
+    storageClass: longhorn
+  enableLogicalReplication: true
+  standby:
+    s3_wal_path: ""
+  tls:
+    secretName: postgres-tls
+    certificateFile: tls.crt
+    privateKeyFile: tls.key
+    caFile: ""
+  sidecars: []
+  patroni:
+    sync_mode: false
+    synchronous_node_count: 1
+    failsafe_mode: true
