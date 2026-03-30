@@ -1,0 +1,4 @@
+# Disable GitLab upgrade check hook
+gitlab:
+  upgradeCheck:
+    enabled: false

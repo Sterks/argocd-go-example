@@ -15,9 +15,7 @@ spec:
         releaseName: gitlab
         valueFiles:
           - $values/deploy/infrastructure/gitlab/values.yaml
-        parameters:
-          - name: gitlab.upgradeCheck.enabled
-            value: "false"
+          - $values/deploy/infrastructure/gitlab/upgrade-check-disable.yaml
     - repoURL: https://github.com/Sterks/argocd-go-example.git
       targetRevision: main
       ref: values
