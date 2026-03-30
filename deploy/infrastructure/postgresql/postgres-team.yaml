@@ -5,6 +5,5 @@ metadata:
   name: myteam
   namespace: postgresql
 spec:
-  additionalMembers:
-  - derunov
-  additionalSuperuserTeams: []
+  additionalMembers: {}
+  additionalSuperuserTeams: {}
