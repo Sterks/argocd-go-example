@@ -22,5 +22,5 @@ spec:
   ignoreDifferences:
     - group: acid.zalan.do
       kind: postgresql
-      managedFieldsManagers:
-        - postgres-operator
+      jsonPointers:
+        - /spec
