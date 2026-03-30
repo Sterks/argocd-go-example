@@ -1,0 +1,18 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: public-ip-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 109.194.67.168/32
+  autoAssign: true
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: metallb-l2-advertisement
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - public-ip-pool

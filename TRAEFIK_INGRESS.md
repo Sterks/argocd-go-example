@@ -49,6 +49,7 @@
 | **Grafana** | grafana.techbit.su | 80/443 | vm-stack-2-grafana:80 | ✅ |
 | **Longhorn** | longhorn.techbit.su | 80/443 | longhorn-frontend:80 | ✅ |
 | **Vault** | vault.techbit.su | 80/443 | vault:8200 | ✅ |
+| **Harbor (Registry)** | harbor.techbit.su | 80/443 | registry:5000 | ✅ |
 
 ---
 
@@ -60,16 +61,41 @@
 | **HTTP** | 30080 | http://192.168.0.101:30080/ |
 | **HTTPS** | 30444 | https://192.168.0.101:30444/ |
 
+### **Domain Access (recommended):**
+| Service | HTTP | HTTPS |
+|---------|------|-------|
+| **Vault** | http://vault.techbit.su | https://vault.techbit.su |
+| **Grafana** | http://grafana.techbit.su | https://grafana.techbit.su |
+| **Longhorn** | http://longhorn.techbit.su | https://longhorn.techbit.su |
+| **Harbor (Registry)** | http://harbor.techbit.su | https://harbor.techbit.su |
+| **Harbor UI** | http://ui.harbor.techbit.su | https://ui.harbor.techbit.su |
+
+> **Note:** To access services without specifying the port, configure DNS to point to any node IP (192.168.0.101-106) or add entries to `/etc/hosts`.
+
 ### **Примеры доступа:**
 ```bash
+# Vault (через NodePort)
+curl -H "Host: vault.techbit.su" http://192.168.0.101:30080/
+
+# Vault (через домен - требуется DNS)
+curl http://vault.techbit.su/
+
 # Grafana
 curl -H "Host: grafana.techbit.su" http://192.168.0.101:30080/
 
 # Longhorn
 curl -H "Host: longhorn.techbit.su" http://192.168.0.101:30080/
 
-# Vault
-curl -H "Host: vault.techbit.su" http://192.168.0.101:30080/
+# Harbor (Docker Registry)
+curl -H "Host: harbor.techbit.su" http://192.168.0.101:30080/v2/_catalog
+
+# Harbor UI (Web интерфейс)
+# Откройте в браузере: http://ui.harbor.techbit.su
+curl -H "Host: ui.harbor.techbit.su" http://192.168.0.101:30080/
+
+# Docker push/pull (требуется DNS или /etc/hosts)
+docker login harbor.techbit.su
+docker push harbor.techbit.su/myimage:tag
 ```
 
 ---
@@ -184,6 +210,8 @@ curl -v -H "Host: <host>" http://192.168.0.101:30080/
 192.168.0.101 grafana.techbit.su
 192.168.0.101 longhorn.techbit.su
 192.168.0.101 vault.techbit.su
+192.168.0.101 harbor.techbit.su
+192.168.0.101 ui.harbor.techbit.su
 ```
 
 Или используйте один IP для всех:

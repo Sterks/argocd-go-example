@@ -1,0 +1,295 @@
+# Docker Registry with Traefik Ingress
+# Access: https://harbor.techbit.su (UI via separate deployment if needed)
+# Docker push/pull: docker login harbor.techbit.su && docker push harbor.techbit.su/myimage:tag
+#
+# HTTPS Configuration:
+# - Self-signed certificate: harbor-tls-letsencrypt (via cert-manager)
+# - For Let's Encrypt: see HARBOR_HTTPS.md
+#
+# Files:
+# - registry-simple.yaml: Main Harbor configuration
+# - harbor-https.yaml: HTTPS/TLS configuration
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: harbor
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: registry-pvc
+  namespace: harbor
+  labels:
+    app: registry
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry
+  namespace: harbor
+  labels:
+    app: registry
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: registry
+  template:
+    metadata:
+      labels:
+        app: registry
+    spec:
+      containers:
+        - name: registry
+          image: registry:2
+          ports:
+            - containerPort: 5000
+              name: registry
+          env:
+            - name: REGISTRY_STORAGE
+              value: "filesystem"
+            - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
+              value: "/var/lib/registry"
+            - name: REGISTRY_HTTP_ADDR
+              value: ":5000"
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: "true"
+            - name: REGISTRY_CATALOG_ENABLED
+              value: "true"
+          volumeMounts:
+            - name: registry-storage
+              mountPath: /var/lib/registry
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+      volumes:
+        - name: registry-storage
+          persistentVolumeClaim:
+            claimName: registry-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry
+  namespace: harbor
+  labels:
+    app: registry
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5000
+      targetPort: 5000
+      protocol: TCP
+      name: registry
+  selector:
+    app: registry
+---
+# NodePort service for direct Docker push/pull via HTTP
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-nodeport
+  namespace: harbor
+  labels:
+    app: registry
+spec:
+  type: NodePort
+  ports:
+    - port: 5000
+      targetPort: 5000
+      nodePort: 30500
+      protocol: TCP
+      name: registry
+  selector:
+    app: registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-ui
+  namespace: harbor
+  labels:
+    app: registry-ui
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: registry-ui
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-ui-nginx-conf
+  namespace: harbor
+data:
+  nginx.conf: |-
+    worker_processes 1;
+    events { worker_connections 1024; }
+    http {
+        access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
+        
+        server {
+            listen 8080;
+            server_name localhost;
+            
+            # Proxy UI static files
+            location / {
+                proxy_pass http://127.0.0.1:80;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+            }
+            
+            # Proxy registry API
+            location /v2/ {
+                proxy_pass http://registry:5000;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_read_timeout 900;
+                proxy_connect_timeout 900;
+                proxy_send_timeout 900;
+                client_max_body_size 0;
+                chunked_transfer_encoding on;
+            }
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry-ui
+  namespace: harbor
+  labels:
+    app: registry-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry-ui
+  template:
+    metadata:
+      labels:
+        app: registry-ui
+    spec:
+      containers:
+        - name: registry-ui
+          image: joxit/docker-registry-ui:latest
+          ports:
+            - containerPort: 80
+              name: ui
+          env:
+            - name: REGISTRY_URLS
+              value: "/"
+            - name: SINGLE_REGISTRY
+              value: "true"
+            - name: SHOW_CONTENT_DIGEST
+              value: "true"
+            - name: DELETE_IMAGES
+              value: "true"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+        - name: nginx-proxy
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: registry-ui-nginx-conf
+---
+# Примечание: Ingress создаётся в harbor-https.yaml с TLS конфигурацией
+# Certificate для HTTPS (использует тот же секрет что и harbor-https.yaml)
+# Примечание: harbor-tls-letsencrypt создаётся в harbor-https.yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: harbor-tls
+  namespace: harbor
+spec:
+  secretName: harbor-tls-letsencrypt  # Используем тот же секрет
+  duration: 2160h  # 90 дней
+  renewBefore: 360h  # 15 дней
+  commonName: harbor.techbit.su
+  dnsNames:
+    - harbor.techbit.su
+    - ui.harbor.techbit.su
+  issuerRef:
+    name: selfsigned-cluster-issuer
+    kind: ClusterIssuer

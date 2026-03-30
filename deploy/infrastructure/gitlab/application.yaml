@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://charts.gitlab.io/
+    chart: gitlab
+    targetRevision: 8.4.1
+    helm:
+      releaseName: gitlab
+      valueFiles:
+        - $values/deploy/infrastructure/gitlab/values.yaml
+      parameters:
+        - name: global.hosts.domain
+          value: techbit.su
+        - name: global.hosts.gitlab
+          value: gitlab.techbit.su
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitlab
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ServerSideApply=true
+  sources:
+    - repoURL: https://charts.gitlab.io/
+      chart: gitlab
+      targetRevision: 8.4.1
+    - repoURL: https://github.com/derunov/argocd-go-example.git
+      targetRevision: HEAD
+      ref: values

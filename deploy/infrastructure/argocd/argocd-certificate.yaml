@@ -10,10 +10,9 @@ spec:
   subject:
     organizations:
       - argocd-go-example
-  commonName: argocd.local
+  commonName: argocd.techbit.su
   dnsNames:
-    - argocd.local
-    - "*.argocd.local"
+    - argocd.techbit.su
   issuerRef:
     name: selfsigned-cluster-issuer
     kind: ClusterIssuer

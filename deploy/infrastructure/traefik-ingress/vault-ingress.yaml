@@ -8,6 +8,10 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
 spec:
+  tls:
+  - hosts:
+    - vault.techbit.su
+    secretName: vault-tls-selfsigned
   rules:
   - host: vault.techbit.su
     http:

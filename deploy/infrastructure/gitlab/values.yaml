@@ -1,0 +1,214 @@
+# GitLab Helm Chart Values - Optimized for resource-constrained environment
+# Based on: https://docs.gitlab.com/charts/
+# 
+# Resource requirements (minimum):
+# - CPU: 4 cores total (we allocate ~3.5 cores)
+# - Memory: 8GB total (we allocate ~6GB)
+# - Storage: 50GB+
+
+global:
+  # GitLab edition (can be 'ce' or 'ee')
+  edition: ce
+  
+  # Hostname for GitLab access
+  hosts:
+    domain: techbit.su
+    gitlab: gitlab.techbit.su
+    
+  # Ingress configuration
+  ingress:
+    configureCertmanager: false
+    class: traefik
+    tls:
+      enabled: true
+      secretName: gitlab-tls-letsencrypt
+      
+  # Use existing Ingress class
+  kubectl:
+    image:
+      repository: registry.k8s.io/kubectl/kubectl
+      tag: v1.31.0
+
+# GitLab Pages (disabled to save resources)
+pages:
+  enabled: false
+
+# GitLab Runner (disabled - use external runner)
+gitlab-runner:
+  install: false
+
+# Registry configuration (integrated with Harbor)
+registry:
+  enabled: true
+  storage:
+    delete:
+      enabled: true
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: longhorn
+  service:
+    type: ClusterIP
+    port: 5000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# PostgreSQL database
+postgresql:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: longhorn
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  # Optimize for smaller memory
+  shmVolume:
+    enabled: true
+
+# Redis configuration
+redis:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: longhorn
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# Gitaly (Git storage)
+gitaly:
+  persistence:
+    enabled: true
+    size: 30Gi
+    storageClass: longhorn
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+# GitLab Webservice (Rails)
+gitlab:
+  webservice:
+    replicas: 1
+    hpa:
+      minReplicas: 1
+      maxReplicas: 1
+    resources:
+      requests:
+        cpu: 200m
+        memory: 768Mi
+      limits:
+        cpu: 1000m
+        memory: 1.5Gi
+    # Disable unused features to save memory
+    config:
+      enabled: true
+      gitlab:
+        rails:
+          # Disable Gravatar for performance
+          gravatar_enabled: false
+          # Optimize database queries
+          database_tasks: true
+
+# GitLab Sidekiq (background jobs)
+sidekiq:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  # Limit concurrent jobs
+  concurrency: 10
+
+# GitLab Shell
+gitlab-shell:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# GitLab KAS (Kubernetes Agent Server)
+gitlab-kas:
+  enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# GitLab Runner (internal - minimal)
+gitlab-runner:
+  install: false
+
+# Prometheus monitoring (disabled to save resources)
+prometheus:
+  install: false
+  serviceMonitor:
+    enabled: false
+
+# GitLab Exporter
+gitlab-exporter:
+  enabled: false
+
+# NGINX Ingress (disabled - using Traefik)
+nginx-ingress:
+  enabled: false
+
+# Cert Manager integration
+certmanager:
+  install: false
+  
+# Create TLS certificate via cert-manager
+certificate:
+  enabled: true
+  issuer:
+    name: selfsigned-cluster-issuer
+    scope: cluster
+
+# Initial root password (change after first login!)
+gitlab:
+  initialRootPassword:
+    secret: gitlab-initial-password
+    key: password
+
+# SMTP/Email configuration (optional - configure after deployment)
+# gitlab:
+#   email:
+#     from: gitlab@techbit.su
+#     display_name: GitLab
+#     reply_to: noreply@techbit.su
+#   smtp:
+#     enabled: false
+#     address: ""
+#     port: 587
+#     user_name: ""
+#     password:
+#       secret: gitlab-smtp
+#       key: password
