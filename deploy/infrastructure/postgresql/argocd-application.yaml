@@ -14,13 +14,8 @@ spec:
     namespace: postgresql
   syncPolicy:
     automated:
-      prune: true
+      prune: false
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - RespectIgnoreDifferences=true
-  ignoreDifferences:
-    - group: acid.zalan.do
-      kind: postgresql
-      jsonPointers:
-        - /spec
+      - ApplyOutOfSyncOnly=true
