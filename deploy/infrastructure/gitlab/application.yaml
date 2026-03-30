@@ -20,8 +20,10 @@ spec:
           value: techbit.su
         - name: global.hosts.gitlab
           value: gitlab.techbit.su
-        - name: certmanager-issuer.email
-          value: admin@techbit.su
+        - name: certmanager.install
+          value: "false"
+        - name: global.ingress.configureCertmanager
+          value: "false"
   destination:
     server: https://kubernetes.default.svc
     namespace: gitlab
