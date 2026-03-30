@@ -39,8 +39,8 @@ gitlab-runner:
 registry:
   enabled: true
   storage:
-    delete:
-      enabled: true
+    secret: gitlab-registry-storage
+    key: config
   persistence:
     enabled: true
     size: 10Gi
@@ -76,7 +76,7 @@ postgresql:
 
 # Redis configuration
 redis:
-  enabled: true
+  install: true
   persistence:
     enabled: true
     size: 5Gi
