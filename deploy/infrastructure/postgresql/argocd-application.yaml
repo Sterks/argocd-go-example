@@ -18,3 +18,10 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
+  ignoreDifferences:
+    - group: acid.zalan.do
+      kind: postgresql
+      jsonPointers:
+        - /spec/volume
+        - /status
