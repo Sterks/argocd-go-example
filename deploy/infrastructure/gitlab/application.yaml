@@ -16,6 +16,7 @@ spec:
         valueFiles:
           - $values/deploy/infrastructure/gitlab/values.yaml
           - $values/deploy/infrastructure/gitlab/upgrade-check-disable.yaml
+        skipCrds: true
     - repoURL: https://github.com/Sterks/argocd-go-example.git
       targetRevision: main
       ref: values
@@ -32,4 +33,4 @@ spec:
       - PruneLast=true
       - ServerSideApply=true
       - SkipSchemaValidation=true
-      - PrunePropagationPolicy=background
+      - SkipHelmHooks=true
