@@ -26,17 +26,9 @@ spec:
       cpu: 500m
       memory: 1Gi
   volume:
-    size: 100Gi
+    size: 10Gi
     storageClass: longhorn
   enableLogicalReplication: true
-  standby:
-    s3_wal_path: ""
-  tls:
-    secretName: postgres-tls
-    certificateFile: tls.crt
-    privateKeyFile: tls.key
-    caFile: ""
-  sidecars: []
   patroni:
     sync_mode: false
     synchronous_node_count: 1
