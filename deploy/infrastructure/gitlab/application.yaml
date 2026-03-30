@@ -18,7 +18,9 @@ spec:
           edition: ce
           hosts:
             domain: techbit.su
-            gitlab: gitlab.techbit.su
+            https: true
+            gitlab:
+              name: gitlab.techbit.su
           ingress:
             configureCertmanager: false
             class: traefik
