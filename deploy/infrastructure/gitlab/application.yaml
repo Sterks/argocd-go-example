@@ -24,7 +24,7 @@ spec:
             value: "false"
           - name: global.ingress.configureCertmanager
             value: "false"
-    - repoURL: https://github.com/derunov/argocd-go-example.git
+    - repoURL: https://github.com/Sterks/argocd-go-example.git
       targetRevision: main
       ref: values
   destination:
