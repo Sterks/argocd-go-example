@@ -39,5 +39,5 @@ spec:
       chart: gitlab
       targetRevision: 8.4.1
     - repoURL: https://github.com/derunov/argocd-go-example.git
-      targetRevision: HEAD
+      targetRevision: main
       ref: values
