@@ -36,10 +36,9 @@ spec:
       - PrunePropagationPolicy=foreground
       - PruneLast=true
       - ServerSideApply=true
-  sources:
-    - repoURL: https://charts.gitlab.io/
-      chart: gitlab
-      targetRevision: 8.4.1
-    - repoURL: https://github.com/derunov/argocd-go-example.git
-      targetRevision: main
-      ref: values
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: gitlab-gitlab-shell-secret
+      jsonPointers:
+        - /data
