@@ -32,6 +32,4 @@ spec:
       - PruneLast=true
       - ServerSideApply=true
       - SkipSchemaValidation=true
-    managedNamespaceMetadata:
-      labels:
-        argocd.argoproj.io/managed-by: argocd
+      - PrunePropagationPolicy=background
