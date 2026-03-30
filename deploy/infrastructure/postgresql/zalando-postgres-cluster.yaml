@@ -28,14 +28,10 @@ spec:
   volume:
     size: 100Gi
     storageClass: longhorn
-  enableLogicalReplication: true
   patroni:
     sync_mode: false
     synchronous_node_count: 1
     failsafe_mode: false
-    dynamicConfiguration:
-      bootstrap:
-        post_init: ""
   usersWithSecretRotation: []
   tls:
     secretName: ""
