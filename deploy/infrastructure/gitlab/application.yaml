@@ -7,23 +7,26 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    repoURL: https://charts.gitlab.io/
-    chart: gitlab
-    targetRevision: 8.4.1
-    helm:
-      releaseName: gitlab
-      valueFiles:
-        - $values/deploy/infrastructure/gitlab/values.yaml
-      parameters:
-        - name: global.hosts.domain
-          value: techbit.su
-        - name: global.hosts.gitlab
-          value: gitlab.techbit.su
-        - name: certmanager.install
-          value: "false"
-        - name: global.ingress.configureCertmanager
-          value: "false"
+  sources:
+    - repoURL: https://charts.gitlab.io/
+      chart: gitlab
+      targetRevision: 8.4.1
+      helm:
+        releaseName: gitlab
+        valueFiles:
+          - $values/deploy/infrastructure/gitlab/values.yaml
+        parameters:
+          - name: global.hosts.domain
+            value: techbit.su
+          - name: global.hosts.gitlab
+            value: gitlab.techbit.su
+          - name: certmanager.install
+            value: "false"
+          - name: global.ingress.configureCertmanager
+            value: "false"
+    - repoURL: https://github.com/derunov/argocd-go-example.git
+      targetRevision: main
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: gitlab
@@ -36,9 +39,3 @@ spec:
       - PrunePropagationPolicy=foreground
       - PruneLast=true
       - ServerSideApply=true
-  ignoreDifferences:
-    - group: ""
-      kind: Secret
-      name: gitlab-gitlab-shell-secret
-      jsonPointers:
-        - /data
