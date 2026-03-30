@@ -9,12 +9,12 @@
 global:
   # GitLab edition (can be 'ce' or 'ee')
   edition: ce
-  
+
   # Hostname for GitLab access
   hosts:
     domain: techbit.su
     gitlab: gitlab.techbit.su
-    
+
   # Ingress configuration
   ingress:
     configureCertmanager: false
@@ -22,12 +22,16 @@ global:
     tls:
       enabled: true
       secretName: gitlab-tls-letsencrypt
-      
+
   # Use existing Ingress class
   kubectl:
     image:
       repository: registry.k8s.io/kubectl/kubectl
       tag: v1.31.0
+
+  # Cert Manager configuration
+  certmanager-issuer:
+    email: admin@techbit.su
 
 # GitLab Pages (disabled to save resources)
 pages:
