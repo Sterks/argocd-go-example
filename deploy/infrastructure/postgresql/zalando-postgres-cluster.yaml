@@ -6,7 +6,7 @@ metadata:
   namespace: postgresql
 spec:
   teamId: "myteam"
-  numberOfInstances: 2
+  numberOfInstances: 1
   users:
     appuser:
     - superuser
@@ -32,10 +32,7 @@ spec:
   patroni:
     sync_mode: false
     synchronous_node_count: 1
-    failsafe_mode: true
-    dynamicConfiguration:
-      kubernetes:
-        bypass_api_service: false
+    failsafe_mode: false
   usersWithSecretRotation: []
   tls:
     secretName: ""
