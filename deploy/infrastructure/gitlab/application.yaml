@@ -15,11 +15,6 @@ spec:
         releaseName: gitlab
         valueFiles:
           - $values/deploy/infrastructure/gitlab/values.yaml
-        parameters:
-          - name: certmanager.install
-            value: "false"
-          - name: global.ingress.configureCertmanager
-            value: "false"
     - repoURL: https://github.com/Sterks/argocd-go-example.git
       targetRevision: main
       ref: values
