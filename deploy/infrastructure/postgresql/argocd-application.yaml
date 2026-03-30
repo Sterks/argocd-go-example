@@ -23,5 +23,8 @@ spec:
     - group: acid.zalan.do
       kind: postgresql
       jsonPointers:
-        - /spec/volume
         - /status
+        - /metadata/creationTimestamp
+        - /metadata/resourceVersion
+        - /metadata/uid
+        - /metadata/managedFields
