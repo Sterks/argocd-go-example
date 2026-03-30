@@ -7,19 +7,124 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  sources:
-    - repoURL: https://charts.gitlab.io/
-      chart: gitlab
-      targetRevision: 8.4.1
-      helm:
-        releaseName: gitlab
-        valueFiles:
-          - $values/deploy/infrastructure/gitlab/values.yaml
-          - $values/deploy/infrastructure/gitlab/upgrade-check-disable.yaml
-        skipCrds: true
-    - repoURL: https://github.com/Sterks/argocd-go-example.git
-      targetRevision: main
-      ref: values
+  source:
+    repoURL: https://charts.gitlab.io/
+    chart: gitlab
+    targetRevision: 8.4.1
+    helm:
+      releaseName: gitlab
+      values: |
+        global:
+          edition: ce
+          hosts:
+            domain: techbit.su
+            gitlab: gitlab.techbit.su
+          ingress:
+            configureCertmanager: false
+            class: traefik
+            tls:
+              enabled: true
+              secretName: gitlab-tls-selfsigned
+          certmanager-issuer:
+            email: admin@techbit.su
+          gitlab:
+            upgradeCheck:
+              enabled: false
+        gitlab:
+          upgradeCheck:
+            enabled: false
+        pages:
+          enabled: false
+        gitlab-runner:
+          install: false
+        registry:
+          enabled: true
+          storage:
+            secret: gitlab-registry-storage
+            key: config
+          persistence:
+            enabled: true
+            size: 10Gi
+            storageClass: longhorn
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+        postgresql:
+          enabled: true
+          persistence:
+            enabled: true
+            size: 20Gi
+            storageClass: longhorn
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          shmVolume:
+            enabled: true
+        redis:
+          install: true
+          persistence:
+            enabled: true
+            size: 5Gi
+            storageClass: longhorn
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+        gitaly:
+          persistence:
+            enabled: true
+            size: 30Gi
+            storageClass: longhorn
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+        webservice:
+          resources:
+            requests:
+              cpu: 250m
+              memory: 768Mi
+            limits:
+              cpu: 1000m
+              memory: 1.5Gi
+        sidekiq:
+          resources:
+            requests:
+              cpu: 250m
+              memory: 768Mi
+            limits:
+              cpu: 1000m
+              memory: 1.5Gi
+        toolbox:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+        certmanager:
+          install: false
+        certificate:
+          enabled: false
+        gitlab:
+          initialRootPassword:
+            secret: gitlab-initial-password
+            key: password
   destination:
     server: https://kubernetes.default.svc
     namespace: gitlab
