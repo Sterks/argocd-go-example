@@ -16,10 +16,6 @@ spec:
         valueFiles:
           - $values/deploy/infrastructure/gitlab/values.yaml
         parameters:
-          - name: global.hosts.domain
-            value: techbit.su
-          - name: global.hosts.gitlab
-            value: gitlab.techbit.su
           - name: certmanager.install
             value: "false"
           - name: global.ingress.configureCertmanager
