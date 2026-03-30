@@ -29,14 +29,9 @@ spec:
               secretName: gitlab-tls-selfsigned
           certmanager-issuer:
             email: admin@techbit.su
-          gitlab:
-            upgradeCheck:
-              enabled: false
         gitlab:
           upgradeCheck:
             enabled: false
-        pages:
-          enabled: false
         gitlab-runner:
           install: false
         registry:
