@@ -1,0 +1,11 @@
+---
+apiVersion: "acid.zalan.do/v1"
+kind: PostgresTeam
+metadata:
+  name: myteam
+  namespace: postgresql
+spec:
+  additionalMembers:
+  - derunov
+  additionalSuperuserTeams: []
+  postgresqlTeams: []
