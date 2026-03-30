@@ -22,6 +22,5 @@ spec:
   ignoreDifferences:
     - group: acid.zalan.do
       kind: postgresql
-      jqPathExpressions:
-        - '.spec.resources'
-        - '.spec.postgresql.parameters'
+      managedFieldsManagers:
+        - postgres-operator
