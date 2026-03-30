@@ -15,6 +15,9 @@ spec:
         releaseName: gitlab
         valueFiles:
           - $values/deploy/infrastructure/gitlab/values.yaml
+        parameters:
+          - name: gitlab.upgradeCheck.enabled
+            value: "false"
     - repoURL: https://github.com/Sterks/argocd-go-example.git
       targetRevision: main
       ref: values
@@ -30,3 +33,7 @@ spec:
       - PrunePropagationPolicy=foreground
       - PruneLast=true
       - ServerSideApply=true
+      - SkipSchemaValidation=true
+    managedNamespaceMetadata:
+      labels:
+        argocd.argoproj.io/managed-by: argocd
