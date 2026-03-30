@@ -33,3 +33,7 @@ spec:
     sync_mode: false
     synchronous_node_count: 1
     failsafe_mode: true
+  usersWithSecretRotation: []
+  tls:
+    secretName: ""
+  additionalVolumes: []
