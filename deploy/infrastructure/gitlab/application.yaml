@@ -133,10 +133,11 @@ spec:
   syncPolicy:
     automated:
       prune: true
-      selfHeal: true
+      selfHeal: false
     syncOptions:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
       - ServerSideApply=true
       - SkipSchemaValidation=true
+      - SkipHelmHooks=true
