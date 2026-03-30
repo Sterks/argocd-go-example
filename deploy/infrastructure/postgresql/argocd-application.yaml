@@ -22,9 +22,6 @@ spec:
   ignoreDifferences:
     - group: acid.zalan.do
       kind: postgresql
-      jsonPointers:
-        - /status
-        - /metadata/creationTimestamp
-        - /metadata/resourceVersion
-        - /metadata/uid
-        - /metadata/managedFields
+      jqPathExpressions:
+        - '.spec.resources'
+        - '.spec.postgresql.parameters'
