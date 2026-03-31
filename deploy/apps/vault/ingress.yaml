@@ -25,4 +25,4 @@ spec:
   tls:
     - hosts:
         - vault.techbit.su
-      secretName: vault-tls
+      secretName: vault-tls-selfsigned
