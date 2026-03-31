@@ -6,7 +6,6 @@ namespace: vault
 resources:
   - manifests.yaml
   - vault-auth-sa.yaml
-  - ingress.yaml
   - vault-loadbalancer.yaml
 
 commonLabels:
