@@ -1,3 +1,43 @@
+---
+# ClusterIssuer для Let's Encrypt через Traefik (HTTP01 challenge)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod-traefik
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: runov.denis@yandex.ru
+    privateKeySecretRef:
+      name: letsencrypt-prod-traefik-account-key
+    solvers:
+      - http01:
+          ingress:
+            class: traefik
+            ingressTemplate:
+              metadata:
+                annotations:
+                  traefik.ingress.kubernetes.io/router.entrypoints: web
+---
+# Certificate для Vault
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vault-tls
+  namespace: vault
+spec:
+  secretName: vault-tls-letsencrypt
+  duration: 2160h  # 90 дней
+  renewBefore: 360h  # 15 дней до истечения
+  commonName: vault.techbit.su
+  dnsNames:
+    - vault.techbit.su
+  issuerRef:
+    name: letsencrypt-prod-traefik
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+# Vault Ingress с TLS
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -8,9 +48,14 @@ metadata:
     app.kubernetes.io/name: vault
     app.kubernetes.io/instance: vault
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    cert-manager.io/cluster-issuer: letsencrypt-prod-traefik
 spec:
   ingressClassName: traefik
+  tls:
+    - hosts:
+        - vault.techbit.su
+      secretName: vault-tls-letsencrypt
   rules:
     - host: vault.techbit.su
       http:
