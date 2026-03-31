@@ -85,8 +85,9 @@ server:
   # Service для доступа к Vault
   service:
     enabled: true
-    type: ClusterIP
+    type: LoadBalancer
     port: 8200
+    externalTrafficPolicy: Cluster
   
   # Persistent Volume для хранения данных Raft
   dataStorage:
