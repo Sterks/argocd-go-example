@@ -1,4 +1,6 @@
 ---
+# PostgreSQL cluster с интеграцией Vault
+# Zalando operator создает секреты в Kubernetes, которые синхронизируются в Vault
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
@@ -6,6 +8,9 @@ metadata:
   namespace: postgresql
   labels:
     app.kubernetes.io/instance: my-postgres-cluster
+  annotations:
+    # Аннотация для синхронизации секретов в Vault
+    secrets.hashicorp.com/vault-sync: "true"
 spec:
   teamId: "myteam"
   numberOfInstances: 1
@@ -38,3 +43,126 @@ spec:
   tls:
     secretName: ""
   additionalVolumes: []
+---
+# Vault Connection для подключения к Vault
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultConnection
+metadata:
+  name: vault-connection
+  namespace: postgresql
+spec:
+  address: "http://vault.vault.svc.cluster.local:8200"
+  auth:
+    kubernetes:
+      mountPath: "auth/kubernetes"
+      role: "postgres-operator"
+      serviceAccount: "default"
+---
+# Vault Static Secret для appuser
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: postgres-appuser-credentials
+  namespace: postgresql
+spec:
+  vaultConnection:
+    connectionRef:
+      name: vault-connection
+  type: "kv"
+  name: "postgres/my-postgres-cluster/appuser"
+  deleteAfterDeletion: false
+  data:
+    username: "appuser"
+    password: "ChangeMe123!"
+---
+# Vault Static Secret для postgres superuser
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: postgres-superuser-credentials
+  namespace: postgresql
+spec:
+  vaultConnection:
+    connectionRef:
+      name: vault-connection
+  type: "kv"
+  name: "postgres/my-postgres-cluster/postgres"
+  deleteAfterDeletion: false
+  data:
+    username: "postgres"
+    password: "PostgresSuper123!"
+---
+# CronJob для периодической синхронизации секретов из Kubernetes в Vault
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-vault-sync
+  namespace: postgresql
+spec:
+  schedule: "0 */6 * * *"  # Каждые 6 часов
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: vault-sync-sa
+          containers:
+            - name: vault-sync
+              image: hashicorp/vault:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # Получение секретов из Kubernetes
+                  APPUSER_PASSWORD=$(kubectl get secret appuser.my-postgres-cluster.credentials.postgresql.acid.zalan.do -n postgresql -o jsonpath='{.data.password}' | base64 -d)
+                  POSTGRES_PASSWORD=$(kubectl get secret postgres.my-postgres-cluster.credentials.postgresql.acid.zalan.do -n postgresql -o jsonpath='{.data.password}' | base64 -d)
+                  
+                  # Запись в Vault
+                  vault kv put -address=$VAULT_ADDR -token=$VAULT_TOKEN secret/postgres/my-postgres-cluster/appuser password="$APPUSER_PASSWORD" username="appuser"
+                  vault kv put -address=$VAULT_ADDR -token=$VAULT_TOKEN secret/postgres/my-postgres-cluster/postgres password="$POSTGRES_PASSWORD" username="postgres"
+                  
+                  echo "Secrets synced to Vault at $(date)"
+              env:
+                - name: VAULT_ADDR
+                  value: "http://vault.vault.svc.cluster.local:8200"
+                - name: VAULT_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: vault-root-token
+                      key: token
+                      optional: true
+          restartPolicy: OnFailure
+---
+# ServiceAccount для синхронизации секретов
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-sync-sa
+  namespace: postgresql
+---
+# Role для доступа к секретам PostgreSQL
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vault-sync-secrets
+  namespace: postgresql
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames:
+      - "appuser.my-postgres-cluster.credentials.postgresql.acid.zalan.do"
+      - "postgres.my-postgres-cluster.credentials.postgresql.acid.zalan.do"
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vault-sync-secrets
+  namespace: postgresql
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: vault-sync-secrets
+subjects:
+  - kind: ServiceAccount
+    name: vault-sync-sa
+    namespace: postgresql
