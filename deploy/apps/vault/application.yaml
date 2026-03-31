@@ -11,6 +11,10 @@ spec:
     repoURL: https://github.com/Sterks/argocd-go-example.git
     targetRevision: HEAD
     path: deploy/apps/vault
+    helm:
+      releaseName: vault
+      valueFiles:
+        - values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: vault
