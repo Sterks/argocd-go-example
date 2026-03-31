@@ -1,23 +1,22 @@
 ---
-# Certificate для Vault с self-signed сертификатом
-apiVersion: cert-manager.io/v1
-kind: Certificate
+# TLSOption для Vault - разрешаем TLS 1.2 и 1.3
+apiVersion: traefik.io/v1alpha1
+kind: TLSOption
 metadata:
-  name: vault-tls
+  name: vault-tlsoption
   namespace: vault
 spec:
-  secretName: vault-tls-selfsigned
-  duration: 8760h  # 1 год
-  renewBefore: 720h  # 30 дней до истечения
-  commonName: vault.techbit.su
-  dnsNames:
-    - vault.techbit.su
-  issuerRef:
-    name: selfsigned-cluster-issuer
-    kind: ClusterIssuer
-    group: cert-manager.io
+  minVersion: VersionTLS12
+  maxVersion: VersionTLS13
+  cipherSuites:
+    - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+    - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+    - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+    - TLS_AES_128_GCM_SHA256
+    - TLS_AES_256_GCM_SHA384
+    - TLS_CHACHA20_POLY1305_SHA256
 ---
-# Vault Ingress с TLS (self-signed)
+# Обновленный Vault Ingress с TLSOption
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -29,6 +28,7 @@ metadata:
     app.kubernetes.io/instance: vault
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls.option: vault-tlsoption@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
@@ -46,3 +46,55 @@ spec:
                 name: vault-ui
                 port:
                   number: 8200
+---
+# Middleware для редиректа HTTP -> HTTPS (опционально)
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-https
+  namespace: vault
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+# IngressRoute для явной маршрутизации через Traefik CRD
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: vault-ingressroute
+  namespace: vault
+  labels:
+    app: vault
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`vault.techbit.su`)
+      kind: Rule
+      services:
+        - name: vault-ui
+          port: 8200
+      middlewares: []
+  tls:
+    secretName: vault-tls-selfsigned
+    options:
+      name: vault-tlsoption
+---
+# IngressRoute для HTTP (редирект на HTTPS)
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: vault-http-redirect
+  namespace: vault
+  labels:
+    app: vault
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`vault.techbit.su`)
+      kind: Rule
+      services:
+        - name: vault-ui
+          port: 8200
