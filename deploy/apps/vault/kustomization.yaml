@@ -6,6 +6,7 @@ namespace: vault
 resources:
   - manifests.yaml
   - vault-auth-sa.yaml
+  - ingress.yaml
 
 commonLabels:
   app.kubernetes.io/name: vault
