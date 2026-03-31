@@ -1,6 +1,7 @@
 ---
 # LoadBalancer сервис для прямого доступа к Vault UI
 # Этот сервис не управляется Helm и сохраняется независимо
+# Используем порты 8200 и 8443 чтобы избежать конфликта с Traefik
 apiVersion: v1
 kind: Service
 metadata:
@@ -15,11 +16,11 @@ spec:
   externalTrafficPolicy: Cluster
   ports:
     - name: http
-      port: 80
+      port: 8200
       targetPort: 8200
       protocol: TCP
     - name: https
-      port: 443
+      port: 8443
       targetPort: 8200
       protocol: TCP
   selector:
