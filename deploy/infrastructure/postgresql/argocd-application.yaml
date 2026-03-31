@@ -6,13 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://charts.cncfstack.com/opensource.zalando.com
-    chart: postgres-cluster
-    targetRevision: 1.15.1
-    helm:
-      releaseName: my-postgres-cluster
-      valueFiles:
-        - values.yaml
+    repoURL: https://github.com/Sterks/argocd-go-example.git
+    targetRevision: HEAD
+    path: deploy/infrastructure/postgresql
   destination:
     server: https://kubernetes.default.svc
     namespace: postgresql
