@@ -14,5 +14,4 @@ spec:
       kind: Rule
       services:
         - name: grafana
-          namespace: victoriametrics
           port: 80
