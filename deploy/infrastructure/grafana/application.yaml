@@ -8,27 +8,13 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://grafana.github.io/helm-charts
-    chart: grafana
-    targetRevision: 8.8.2
+    repoURL: https://github.com/Sterks/argocd-go-example.git
+    targetRevision: HEAD
+    path: deploy/infrastructure/grafana
     helm:
       releaseName: grafana
-      values: |
-        adminPassword: admin
-        service:
-          type: ClusterIP
-          port: 80
-        ingress:
-          enabled: false
-        datasources:
-          datasources.yaml:
-            apiVersion: 1
-            datasources:
-            - access: proxy
-              isDefault: true
-              name: VictoriaMetrics
-              type: prometheus
-              url: http://vmsingle-victoriametrics.victoriametrics.svc:8429
+      valueFiles:
+        - values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: grafana
@@ -40,3 +26,9 @@ spec:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
+  ignoreDifferences:
+    - group: traefik.io
+      kind: IngressRoute
+      jsonPointers:
+        - /metadata/resourceVersion
+        - /metadata/uid
