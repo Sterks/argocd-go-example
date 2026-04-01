@@ -9,6 +9,10 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
 spec:
   ingressClassName: traefik
+  tls:
+    - hosts:
+        - argocd.techbit.su
+      secretName: argocd-tls-secret
   rules:
     - host: argocd.techbit.su
       http:
