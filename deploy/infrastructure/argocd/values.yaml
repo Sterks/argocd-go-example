@@ -1,0 +1,10 @@
+namespace: argocd
+service:
+  enabled: true
+ingress:
+  enabled: true
+  className: traefik
+  host: argocd.techbit.su
+certificate:
+  enabled: true
+  secretName: argocd-tls

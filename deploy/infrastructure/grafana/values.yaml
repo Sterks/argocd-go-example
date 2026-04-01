@@ -1,0 +1,7 @@
+namespace: victoriametrics
+configmap:
+  enabled: true
+ingress:
+  enabled: true
+  className: traefik
+  host: grafana.techbit.su

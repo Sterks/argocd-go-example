@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: victoriametrics
+  name: traefik
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -10,14 +10,14 @@ spec:
   source:
     repoURL: https://github.com/Sterks/argocd-go-example.git
     targetRevision: HEAD
-    path: deploy/apps/victoriametrics
+    path: deploy/infrastructure/traefik
     helm:
-      releaseName: victoriametrics
+      releaseName: traefik
       valueFiles:
         - values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: victoriametrics
+    namespace: traefik-system
   syncPolicy:
     automated:
       prune: true

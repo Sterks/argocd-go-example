@@ -1,0 +1,3 @@
+registry:
+  enabled: true
+  host: harbor.techbit.su

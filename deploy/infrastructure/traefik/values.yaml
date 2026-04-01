@@ -1,0 +1,321 @@
+# Traefik Helm Chart Values
+# Based on official documentation: https://doc.traefik.io/traefik/
+# Chart Version: 39.0.7 | App Version: v3.6.12
+
+# =============================================================================
+# IMAGE CONFIGURATION
+# =============================================================================
+image:
+  registry: docker.io
+  repository: traefik
+  tag: "v3.2.4"  # Using stable v3.x version
+  pullPolicy: IfNotPresent
+
+# =============================================================================
+# SECURITY CONTEXT (Production Hardening)
+# =============================================================================
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: [ALL]
+  readOnlyRootFilesystem: false  # Required for /data persistence
+
+podSecurityContext:
+  runAsGroup: 65532
+  runAsNonRoot: true
+  runAsUser: 65532
+  seccompProfile:
+    type: RuntimeDefault
+
+# =============================================================================
+# RBAC CONFIGURATION
+# =============================================================================
+rbac:
+  enabled: true
+  namespaced: false  # Cluster-wide permissions for Ingress
+
+serviceAccount:
+  create: true
+  name: traefik
+  annotations: {}
+
+# =============================================================================
+# PORTS AND ENTRYPOINTS CONFIGURATION
+# =============================================================================
+ports:
+  # Traefik admin port (dashboard, ping, metrics)
+  traefik:
+    port: 8080
+    expose: false
+    exposedPort: 8080
+    protocol: TCP
+  
+  # HTTP entrypoint - redirects to HTTPS
+  web:
+    port: 8000
+    expose: true
+    exposedPort: 80
+    nodePort: 31184
+    protocol: TCP
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+          priority: 10
+  
+  # HTTPS entrypoint - TLS termination
+  websecure:
+    port: 8443
+    expose: true
+    exposedPort: 443
+    nodePort: 32648
+    protocol: TCP
+    tls:
+      enabled: true
+      options: ""
+      certResolver: ""
+      domains: []
+    http3:
+      enabled: false
+  
+  # Metrics endpoint for Prometheus
+  metrics:
+    port: 9100
+    expose: false
+    exposedPort: 9100
+    protocol: TCP
+
+# =============================================================================
+# PROVIDERS CONFIGURATION
+# =============================================================================
+providers:
+  # Kubernetes CRD Provider (IngressRoute, Middleware, etc.)
+  kubernetesCRD:
+    enabled: true
+    allowCrossNamespace: false
+    allowExternalNameServices: false
+    allowEmptyServices: true
+    ingressClass: ""
+    labelSelector: ""
+    namespaces: []
+  
+  # Kubernetes Ingress Provider
+  kubernetesIngress:
+    enabled: true
+    allowExternalNameServices: false
+    allowEmptyServices: true
+    ingressClass: "traefik"
+    labelSelector: ""
+    namespaces: []
+    publishedService:
+      enabled: true
+      pathOverride: ""
+  
+  # Kubernetes Gateway API (Experimental)
+  kubernetesGateway:
+    enabled: false
+    experimentalChannel: false
+    namespaces: []
+  
+  # File Provider (for static configuration)
+  file:
+    enabled: false
+    watch: true
+    content: ""
+
+# =============================================================================
+# LOGS CONFIGURATION
+# =============================================================================
+logs:
+  general:
+    format: "json"  # JSON format for better parsing
+    level: "INFO"   # TRACE, DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+    filePath: ""
+    noColor: false
+  access:
+    enabled: true  # Enable access logs for auditing
+    format: "json"
+    filePath: ""
+    bufferingSize: 0
+    filters:
+      statuscodes: ["100-599"]
+      retryattempts: false
+      minduration: ""
+    fields:
+      general:
+        defaultmode: keep
+        names: {}
+      headers:
+        defaultmode: drop
+        names: {}
+
+# =============================================================================
+# METRICS CONFIGURATION (Prometheus)
+# =============================================================================
+metrics:
+  addInternals: false
+  prometheus:
+    entryPoint: metrics
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+    buckets: ""
+    manualRouting: false
+    service:
+      enabled: true
+      labels: {}
+      annotations: {}
+    serviceMonitor:
+      enabled: false  # Enable if Prometheus Operator is installed
+      apiVersion: "monitoring.coreos.com/v1"
+      metricRelabelings: []
+      relabelings: []
+      interval: ""
+      scrapeTimeout: ""
+
+# =============================================================================
+# API AND DASHBOARD CONFIGURATION
+# =============================================================================
+api:
+  dashboard: true
+  insecure: false  # Disabled for security - access via IngressRoute
+  debug: false
+
+# =============================================================================
+# GLOBAL SETTINGS
+# =============================================================================
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+
+# =============================================================================
+# PERSISTENCE (Required for ACME certificates)
+# =============================================================================
+persistence:
+  enabled: true
+  name: data
+  accessMode: ReadWriteOnce
+  size: 128Mi
+  path: /data
+  storageClass: ""
+
+# =============================================================================
+# TLS OPTIONS
+# =============================================================================
+tlsOptions: {}
+# Example:
+# default:
+#   minVersion: VersionTLS12
+#   maxVersion: VersionTLS13
+#   cipherSuites:
+#     - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+#     - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+
+tlsStore: {}
+
+# =============================================================================
+# CERTIFICATE RESOLVERS (ACME/Let's Encrypt)
+# =============================================================================
+certificatesResolvers: {}
+# Example for Let's Encrypt:
+# letsencrypt:
+#   acme:
+#     email: admin@techbit.su
+#     storage: /data/acme.json
+#     httpChallenge:
+#       entryPoint: web
+
+# =============================================================================
+# ADDITIONAL ARGUMENTS
+# =============================================================================
+additionalArguments:
+  - "--ping=true"
+  - "--ping.entryPoint=traefik"
+
+# =============================================================================
+# RESOURCES
+# =============================================================================
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "500m"
+    memory: "256Mi"
+
+# =============================================================================
+# SERVICE CONFIGURATION
+# =============================================================================
+service:
+  enabled: true
+  type: NodePort
+  annotations: {}
+  labels: {}
+  spec: {}
+  loadBalancerSourceRanges: []
+  externalIPs: []
+
+# =============================================================================
+# AUTOSCALING
+# =============================================================================
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  metrics: []
+
+# =============================================================================
+# NODE SCHEDULING
+# =============================================================================
+affinity: {}
+# Example for HA:
+# podAntiAffinity:
+#   preferredDuringSchedulingIgnoredDuringExecution:
+#     - weight: 100
+#       podAffinityTerm:
+#         labelSelector:
+#           matchLabels:
+#             app.kubernetes.io/name: traefik
+#         topologyKey: kubernetes.io/hostname
+
+tolerations: []
+nodeSelector: {}
+topologySpreadConstraints: []
+
+# =============================================================================
+# EXTRA OBJECTS (Middleware, Secret, etc.)
+# =============================================================================
+extraObjects: []
+# Example for BasicAuth on dashboard:
+# - apiVersion: v1
+#   kind: Secret
+#   metadata:
+#     name: traefik-dashboard-auth
+#   type: Opaque
+#   data:
+#     users: <base64-encoded-htpasswd>
+# - apiVersion: traefik.io/v1alpha1
+#   kind: Middleware
+#   metadata:
+#     name: dashboard-auth
+#   spec:
+#     basicAuth:
+#       secret: traefik-dashboard-auth
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+volumes: []
+volumeMounts: []
+
+# =============================================================================
+# HOST NETWORK
+# =============================================================================
+hostNetwork: false
+
+# =============================================================================
+# PRIORITY CLASS
+# =============================================================================
+priorityClassName: ""

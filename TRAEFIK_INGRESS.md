@@ -58,8 +58,8 @@
 ### **Traefik NodePort:**
 | Protocol | Port | URL |
 |----------|------|-----|
-| **HTTP** | 30080 | http://192.168.0.101:30080/ |
-| **HTTPS** | 30444 | https://192.168.0.101:30444/ |
+| **HTTP** | 31184 | http://192.168.0.101:31184/ |
+| **HTTPS** | 32648 | https://192.168.0.101:32648/ |
 
 ### **Domain Access (recommended):**
 | Service | HTTP | HTTPS |
@@ -75,23 +75,23 @@
 ### **Примеры доступа:**
 ```bash
 # Vault (через NodePort)
-curl -H "Host: vault.techbit.su" http://192.168.0.101:30080/
+curl -H "Host: vault.techbit.su" http://192.168.0.101:31184/
 
 # Vault (через домен - требуется DNS)
 curl http://vault.techbit.su/
 
 # Grafana
-curl -H "Host: grafana.techbit.su" http://192.168.0.101:30080/
+curl -H "Host: grafana.techbit.su" http://192.168.0.101:31184/
 
 # Longhorn
-curl -H "Host: longhorn.techbit.su" http://192.168.0.101:30080/
+curl -H "Host: longhorn.techbit.su" http://192.168.0.101:31184/
 
 # Harbor (Docker Registry)
-curl -H "Host: harbor.techbit.su" http://192.168.0.101:30080/v2/_catalog
+curl -H "Host: harbor.techbit.su" http://192.168.0.101:31184/v2/_catalog
 
 # Harbor UI (Web интерфейс)
 # Откройте в браузере: http://ui.harbor.techbit.su
-curl -H "Host: ui.harbor.techbit.su" http://192.168.0.101:30080/
+curl -H "Host: ui.harbor.techbit.su" http://192.168.0.101:31184/
 
 # Docker push/pull (требуется DNS или /etc/hosts)
 docker login harbor.techbit.su

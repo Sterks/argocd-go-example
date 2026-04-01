@@ -1,0 +1,9 @@
+namespace: argocd-go-example
+replicas: 2
+image:
+  repository: harbor.techbit.su/library/argocd-go-example
+  tag: latest
+service:
+  port: 8080
+vault:
+  enabled: true

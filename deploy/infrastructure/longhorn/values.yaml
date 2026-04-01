@@ -1,0 +1,10 @@
+# Longhorn Ingress for Traefik
+ingress:
+  enabled: true
+  className: traefik
+  host: longhorn.techbit.su
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  service:
+    name: longhorn-frontend
+    port: 80

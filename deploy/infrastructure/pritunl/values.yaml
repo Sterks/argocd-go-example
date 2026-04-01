@@ -1,0 +1,8 @@
+namespace: pritunl
+mongodb:
+  enabled: true
+  storage: 10Gi
+pritunl:
+  replicas: 1
+  service:
+    type: LoadBalancer
