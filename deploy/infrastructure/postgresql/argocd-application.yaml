@@ -3,19 +3,26 @@ kind: Application
 metadata:
   name: postgres-cluster
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
     repoURL: https://github.com/Sterks/argocd-go-example.git
     targetRevision: HEAD
     path: deploy/infrastructure/postgresql
+    helm:
+      releaseName: postgres-cluster
+      valueFiles:
+        - values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: postgresql
   syncPolicy:
     automated:
-      prune: false
+      prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ApplyOutOfSyncOnly=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

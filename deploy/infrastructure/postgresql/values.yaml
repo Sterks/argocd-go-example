@@ -1,0 +1,13 @@
+cluster:
+  name: my-postgres-cluster
+  teamId: myteam
+  instances: 1
+  version: "16"
+  size: 100Gi
+  storageClass: longhorn
+  cpu:
+    request: 250m
+    limit: 500m
+  memory:
+    request: 512Mi
+    limit: 1Gi
