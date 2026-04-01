@@ -30,11 +30,11 @@ ingressRoute:
     secretName: vault-tls-selfsigned
     options:
       name: vault-tlsoption
-      namespace: vault
 
 tlsOption:
   enabled: true
   name: vault-tlsoption
+  namespace: vault
   minVersion: VersionTLS12
   maxVersion: VersionTLS13
   cipherSuites:

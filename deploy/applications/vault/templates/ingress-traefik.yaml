@@ -6,7 +6,7 @@ apiVersion: traefik.io/v1alpha1
 kind: TLSOption
 metadata:
   name: {{ .Values.tlsOption.name }}
-  namespace: {{ .Values.tlsOption.options.namespace | default "vault" }}
+  namespace: {{ .Values.tlsOption.namespace | default "vault" }}
   labels:
     app.kubernetes.io/name: vault
     app.kubernetes.io/instance: vault
@@ -39,7 +39,7 @@ spec:
     secretName: {{ .Values.ingressRoute.tls.secretName }}
     options:
       name: {{ .Values.ingressRoute.tls.options.name }}
-      namespace: {{ .Values.ingressRoute.tls.options.namespace }}
+      namespace: {{ .Values.tlsOption.namespace | default "vault" }}
 ---
 # IngressRoute для HTTP
 apiVersion: traefik.io/v1alpha1
