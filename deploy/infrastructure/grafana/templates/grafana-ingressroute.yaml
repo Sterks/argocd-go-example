@@ -6,6 +6,8 @@ metadata:
   labels:
     app.kubernetes.io/name: grafana
     app.kubernetes.io/instance: grafana
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
 spec:
   entryPoints:
     - websecure
