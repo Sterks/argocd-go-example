@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: argocd-go-example
-  labels:
-    app: argocd-go-example

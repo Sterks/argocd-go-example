@@ -5,12 +5,15 @@ metadata:
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   project: default
   source:
     repoURL: https://github.com/Sterks/argocd-go-example.git
     targetRevision: HEAD
-    path: deploy/infrastructure/pritunl
+    path: deploy/applications/pritunl
   destination:
     server: https://kubernetes.default.svc
     namespace: pritunl
@@ -22,3 +25,9 @@ spec:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
+  ignoreDifferences:
+    - group: ""
+      kind: PersistentVolumeClaim
+      jsonPointers:
+        - /spec/storageClassName
+        - /spec/volumeName

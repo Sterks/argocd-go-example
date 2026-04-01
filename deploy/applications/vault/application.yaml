@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: go-app
+  name: vault
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -10,10 +10,14 @@ spec:
   source:
     repoURL: https://github.com/Sterks/argocd-go-example.git
     targetRevision: HEAD
-    path: deploy/apps/go-app
+    path: deploy/applications/vault
+    helm:
+      releaseName: vault
+      valueFiles:
+        - values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd-go-example
+    namespace: vault
   syncPolicy:
     automated:
       prune: true
@@ -22,3 +26,8 @@ spec:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /spec/replicas

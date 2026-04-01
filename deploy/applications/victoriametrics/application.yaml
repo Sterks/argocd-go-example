@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: vault
+  name: victoriametrics
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -10,14 +10,14 @@ spec:
   source:
     repoURL: https://github.com/Sterks/argocd-go-example.git
     targetRevision: HEAD
-    path: deploy/apps/vault
+    path: deploy/applications/victoriametrics
     helm:
-      releaseName: vault
+      releaseName: victoriametrics
       valueFiles:
         - values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: vault
+    namespace: victoriametrics
   syncPolicy:
     automated:
       prune: true
@@ -26,8 +26,3 @@ spec:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
-  ignoreDifferences:
-    - group: apps
-      kind: StatefulSet
-      jsonPointers:
-        - /spec/replicas
