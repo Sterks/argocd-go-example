@@ -20,7 +20,6 @@
 │       ├── grafana/          # Grafana (standalone)
 │       ├── harbor/           # Harbor Registry
 │       ├── longhorn/         # Longhorn Storage
-│       ├── pritunl/          # Pritunl VPN
 │       └── traefik/          # Traefik Ingress Controller
 │
 └── scripts/                   # Скрипты для настройки
@@ -51,8 +50,6 @@ kubectl apply -f deploy/infrastructure/harbor/application.yaml
 # GitLab
 kubectl apply -f deploy/infrastructure/gitlab/application.yaml
 
-# Pritunl (VPN)
-kubectl apply -f deploy/infrastructure/pritunl/application.yaml
 
 # Grafana
 kubectl apply -f deploy/infrastructure/grafana/application.yaml
@@ -82,7 +79,6 @@ kubectl apply -f deploy/applications/victoriametrics/application.yaml
 | **Longhorn** | `deploy/infrastructure/longhorn/` | local chart |
 | **Harbor** | `deploy/infrastructure/harbor/` | local chart |
 | **GitLab** | `deploy/infrastructure/gitlab/` | local chart |
-| **Pritunl** | `deploy/infrastructure/pritunl/` | local chart |
 | **Grafana** | `deploy/infrastructure/grafana/` | local chart |
 | **Vault** | `deploy/applications/vault/` | local chart |
 | **VictoriaMetrics** | `deploy/applications/victoriametrics/` | local chart |
