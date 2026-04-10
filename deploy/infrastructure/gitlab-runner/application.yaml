@@ -15,7 +15,7 @@ spec:
       releaseName: gitlab-runner
       values: |
         gitlabUrl: http://gitlab.techbit.su
-        runnerToken: "glrt-UdrzaFjzclPA2MeyPlQ_7m86MQp0OjEKdToxCw.01.121lhly46"
+        runnerToken: "glrt-ZORzIVOYhn7w1RJhodiEam86MQp0OjEKdToxCw.01.120g8j536"
         runners:
           config: |
             [[runners]]
