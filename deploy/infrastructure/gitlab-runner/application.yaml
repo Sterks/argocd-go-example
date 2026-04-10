@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab-runner
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://charts.gitlab.io/
+    chart: gitlab-runner
+    targetRevision: 0.55.0
+    helm:
+      releaseName: gitlab-runner
+      values: |
+        gitlabUrl: http://gitlab.techbit.su
+        runnerToken: "glrt-UdrzaFjzclPA2MeyPlQ_7m86MQp0OjEKdToxCw.01.121lhly46"
+        runners:
+          config: |
+            [[runners]]
+              executor = "kubernetes"
+              [runners.kubernetes]
+                namespace = "gitlab-ci"
+                image = "ubuntu:22.04"
+                privileged = false
+          concurrent: 10
+          checkInterval: 10
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitlab-runner
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

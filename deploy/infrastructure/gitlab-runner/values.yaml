@@ -1,0 +1,12 @@
+gitlabUrl: http://gitlab.techbit.su
+runnerToken: "glrt-UdrzaFjzclPA2MeyPlQ_7m86MQp0OjEKdToxCw.01.121lhly46"  # Runner Authentication Token (GitLab 16+)
+runners:
+  config: |
+    [[runners]]
+      executor = "kubernetes"
+      [runners.kubernetes]
+        namespace = "gitlab-ci"
+        image = "ubuntu:22.04"
+        privileged = false
+  concurrent: 10
+  checkInterval: 10

@@ -1,6 +1,0 @@
-apiVersion: v1
-name: victoriametrics
-version: 1.0.0
-appVersion: 0.41.0
-description: VictoriaMetrics Helm Chart
-type: application

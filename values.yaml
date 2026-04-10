@@ -1,0 +1,567 @@
+USER-SUPPLIED VALUES:
+autoDiscovery: false
+common:
+  image:
+    tag: ""
+extraObjects: []
+extraSecrets: []
+global:
+  cluster:
+    dnsDomain: cluster.local.
+  compatibility:
+    openshift:
+      adaptSecurityContext: auto
+  image:
+    registry: ""
+    vm:
+      tag: ""
+  imagePullSecrets: []
+license:
+  key: ""
+  secret:
+    key: ""
+    name: ""
+nameOverride: ""
+printNotes: true
+serviceAccount:
+  annotations: {}
+  automountToken: true
+  create: true
+  extraLabels: {}
+  name: null
+vmauth:
+  affinity: {}
+  annotations: {}
+  config: {}
+  configSecretName: ""
+  containerWorkingDir: ""
+  enabled: false
+  env: []
+  envFrom: []
+  extraArgs:
+    envflag.enable: true
+    envflag.prefix: VM_
+    httpListenAddr: :8427
+    loggerFormat: json
+  extraContainers: []
+  extraLabels: {}
+  extraVolumeMounts: []
+  extraVolumes: []
+  fullnameOverride: ""
+  horizontalPodAutoscaler:
+    behavior: {}
+    enabled: false
+    maxReplicas: 10
+    metrics: []
+    minReplicas: 2
+  image:
+    pullPolicy: IfNotPresent
+    registry: ""
+    repository: victoriametrics/vmauth
+    tag: ""
+    variant: ""
+  ingress:
+    annotations: {}
+    enabled: false
+    extraLabels: {}
+    hosts:
+    - name: vmauth.local
+      path:
+      - /insert
+      port: http
+    pathType: Prefix
+    tls: []
+  initContainers: []
+  lifecycle: {}
+  name: ""
+  nodeSelector: {}
+  podAnnotations: {}
+  podDisruptionBudget:
+    enabled: false
+    labels: {}
+    maxUnavailable: 0
+    minAvailable: 0
+    unhealthyPodEvictionPolicy: null
+  podLabels: {}
+  podSecurityContext:
+    enabled: false
+  ports:
+    name: http
+  priorityClassName: ""
+  probe:
+    liveness:
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      tcpSocket: {}
+      timeoutSeconds: 5
+    readiness:
+      failureThreshold: 10
+      httpGet: {}
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 5
+    startup: {}
+  replicaCount: 2
+  resources: {}
+  route:
+    annotations: {}
+    enabled: false
+    extraRules: []
+    filters: []
+    hostnames: []
+    labels: {}
+    matches:
+    - path:
+        type: PathPrefix
+        value: '{{ dig "extraArgs" "http.pathPrefix" "/" .Values.vmauth }}'
+    parentRefs: []
+  securityContext:
+    enabled: false
+  service:
+    annotations: {}
+    clusterIP: ""
+    enabled: true
+    externalIPs: []
+    externalTrafficPolicy: ""
+    extraPorts: []
+    healthCheckNodePort: ""
+    ipFamilies: []
+    ipFamilyPolicy: ""
+    labels: {}
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    servicePort: 8427
+    targetPort: http
+    trafficDistribution: ""
+    type: ClusterIP
+    udp: false
+  serviceMonitor:
+    annotations: {}
+    basicAuth: {}
+    enabled: false
+    extraLabels: {}
+    metricRelabelings: []
+    namespace: ""
+    relabelings: []
+  strategy: {}
+  suppressStorageFQDNsRender: false
+  tolerations: []
+  topologySpreadConstraints: []
+  verticalPodAutoscaling:
+    enabled: false
+vminsert:
+  affinity: {}
+  annotations: {}
+  containerWorkingDir: ""
+  enabled: true
+  env: []
+  envFrom: []
+  excludeStorageIDs: []
+  extraArgs:
+    envflag.enable: true
+    envflag.prefix: VM_
+    httpListenAddr: :8480
+    loggerFormat: json
+  extraContainers: []
+  extraLabels: {}
+  extraVolumeMounts: []
+  extraVolumes: []
+  fullnameOverride: ""
+  horizontalPodAutoscaler:
+    behavior: {}
+    enabled: false
+    maxReplicas: 10
+    metrics: []
+    minReplicas: 2
+  image:
+    pullPolicy: IfNotPresent
+    registry: ""
+    repository: victoriametrics/vminsert
+    tag: ""
+    variant: cluster
+  ingress:
+    annotations: {}
+    enabled: false
+    extraLabels: {}
+    hosts:
+    - name: vminsert.local
+      path:
+      - /insert
+      port: http
+    ingressClassName: ""
+    pathType: Prefix
+    tls: []
+  initContainers: []
+  lifecycle: {}
+  name: ""
+  nodeSelector: {}
+  podAnnotations: {}
+  podDisruptionBudget:
+    enabled: false
+    labels: {}
+    maxUnavailable: 0
+    minAvailable: 0
+    unhealthyPodEvictionPolicy: null
+  podLabels: {}
+  podSecurityContext:
+    enabled: false
+  ports:
+    name: http
+  priorityClassName: ""
+  probe:
+    liveness:
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      tcpSocket: {}
+      timeoutSeconds: 5
+    readiness:
+      failureThreshold: 10
+      httpGet: {}
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 5
+    startup: {}
+  relabel:
+    config: []
+    configMap: ""
+    enabled: false
+  replicaCount: 2
+  resources: {}
+  route:
+    annotations: {}
+    enabled: false
+    extraRules: []
+    filters: []
+    hostnames: []
+    labels: {}
+    matches:
+    - path:
+        type: PathPrefix
+        value: '{{ dig "extraArgs" "http.pathPrefix" "/insert" .Values.vminsert }}'
+    parentRefs: []
+  securityContext:
+    enabled: false
+  service:
+    annotations: {}
+    clusterIP: ""
+    enabled: true
+    externalIPs: []
+    externalTrafficPolicy: ""
+    extraPorts: []
+    healthCheckNodePort: ""
+    ipFamilies: []
+    ipFamilyPolicy: ""
+    labels: {}
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    servicePort: 8480
+    targetPort: http
+    trafficDistribution: ""
+    type: ClusterIP
+    udp: false
+  serviceMonitor:
+    annotations: {}
+    basicAuth: {}
+    enabled: false
+    extraLabels: {}
+    metricRelabelings: []
+    namespace: ""
+    relabelings: []
+  strategy: {}
+  suppressStorageFQDNsRender: false
+  terminationGracePeriodSeconds: 30
+  tolerations: []
+  topologySpreadConstraints: []
+  verticalPodAutoscaling:
+    enabled: false
+vmselect:
+  affinity: {}
+  annotations: {}
+  cacheMountPath: /cache
+  containerWorkingDir: ""
+  deployment:
+    spec:
+      strategy: {}
+  emptyDir: {}
+  enabled: true
+  env: []
+  envFrom: []
+  extraArgs:
+    envflag.enable: true
+    envflag.prefix: VM_
+    httpListenAddr: :8481
+    loggerFormat: json
+  extraContainers: []
+  extraHostPathMounts: []
+  extraLabels: {}
+  extraVolumeMounts: []
+  extraVolumes: []
+  fullnameOverride: ""
+  horizontalPodAutoscaler:
+    behavior: {}
+    enabled: false
+    maxReplicas: 10
+    metrics: []
+    minReplicas: 2
+  image:
+    pullPolicy: IfNotPresent
+    registry: ""
+    repository: victoriametrics/vmselect
+    tag: ""
+    variant: cluster
+  ingress:
+    annotations: {}
+    enabled: false
+    extraLabels: {}
+    hosts:
+    - name: vmselect.local
+      path:
+      - /select
+      port: http
+    ingressClassName: ""
+    pathType: Prefix
+    tls: []
+  initContainers: []
+  lifecycle: {}
+  mode: deployment
+  name: ""
+  nodeSelector: {}
+  persistentVolume:
+    accessModes:
+    - ReadWriteOnce
+    annotations: {}
+    enabled: false
+    existingClaim: ""
+    extraLabels: {}
+    name: ""
+    size: 20Gi
+    subPath: ""
+  podAnnotations: {}
+  podDisruptionBudget:
+    enabled: false
+    labels: {}
+    maxUnavailable: 0
+    minAvailable: 0
+    unhealthyPodEvictionPolicy: null
+  podLabels: {}
+  podSecurityContext:
+    enabled: true
+  ports:
+    name: http
+  priorityClassName: ""
+  probe:
+    liveness:
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      tcpSocket: {}
+      timeoutSeconds: 5
+    readiness:
+      failureThreshold: 10
+      httpGet: {}
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 5
+    startup: {}
+  replicaCount: 2
+  resources: {}
+  route:
+    annotations: {}
+    enabled: false
+    extraRules: []
+    filters: []
+    hostnames: []
+    labels: {}
+    matches:
+    - path:
+        type: PathPrefix
+        value: '{{ dig "extraArgs" "http.pathPrefix" "/select" .Values.vmselect }}'
+    parentRefs: []
+  securityContext:
+    enabled: true
+  service:
+    annotations: {}
+    clusterIP: ""
+    enabled: true
+    externalIPs: []
+    externalTrafficPolicy: ""
+    extraPorts: []
+    healthCheckNodePort: ""
+    ipFamilies: []
+    ipFamilyPolicy: ""
+    labels: {}
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    servicePort: 8481
+    targetPort: http
+    trafficDistribution: ""
+    type: ClusterIP
+  serviceMonitor:
+    annotations: {}
+    basicAuth: {}
+    enabled: false
+    extraLabels: {}
+    metricRelabelings: []
+    namespace: ""
+    relabelings: []
+  statefulSet:
+    spec:
+      podManagementPolicy: OrderedReady
+  suppressStorageFQDNsRender: false
+  terminationGracePeriodSeconds: 60
+  tolerations: []
+  topologySpreadConstraints: []
+  verticalPodAutoscaling:
+    enabled: false
+vmstorage:
+  affinity: {}
+  annotations: {}
+  containerWorkingDir: ""
+  emptyDir: {}
+  enabled: true
+  env: []
+  envFrom: []
+  extraArgs:
+    envflag.enable: true
+    envflag.prefix: VM_
+    httpListenAddr: :8482
+    loggerFormat: json
+  extraContainers: []
+  extraHostPathMounts: []
+  extraLabels: {}
+  extraSecretMounts: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  fullnameOverride: null
+  horizontalPodAutoscaler:
+    behavior:
+      scaleDown:
+        selectPolicy: Disabled
+    enabled: false
+    maxReplicas: 10
+    metrics: []
+    minReplicas: 2
+  image:
+    pullPolicy: IfNotPresent
+    registry: ""
+    repository: victoriametrics/vmstorage
+    tag: ""
+    variant: cluster
+  initContainers: []
+  lifecycle: {}
+  minReadySeconds: 5
+  name: ""
+  nodeSelector: {}
+  persistentVolume:
+    accessModes:
+    - ReadWriteOnce
+    annotations: {}
+    enabled: true
+    existingClaim: ""
+    extraLabels: {}
+    mountPath: /storage
+    name: vmstorage-volume
+    size: 8Gi
+    storageClassName: longhorn
+    subPath: ""
+  podAnnotations: {}
+  podDisruptionBudget:
+    enabled: false
+    labels: {}
+    maxUnavailable: 0
+    minAvailable: 0
+    unhealthyPodEvictionPolicy: null
+  podLabels: {}
+  podManagementPolicy: OrderedReady
+  podSecurityContext:
+    enabled: false
+  ports:
+    name: http
+  priorityClassName: ""
+  probe:
+    readiness:
+      failureThreshold: 10
+      httpGet: {}
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 5
+    startup: {}
+  replicaCount: 2
+  resources: {}
+  retentionPeriod: 1
+  schedulerName: ""
+  securityContext:
+    enabled: false
+  service:
+    annotations: {}
+    clusterIP: None
+    enabled: true
+    externalTrafficPolicy: ""
+    extraPorts: []
+    healthCheckNodePort: ""
+    ipFamilies: []
+    ipFamilyPolicy: ""
+    labels: {}
+    servicePort: 8482
+    trafficDistribution: ""
+    type: ClusterIP
+    vminsertPort: 8400
+    vmselectPort: 8401
+  serviceMonitor:
+    annotations: {}
+    basicAuth: {}
+    enabled: false
+    extraLabels: {}
+    metricRelabelings: []
+    namespace: ""
+    relabelings: []
+  terminationGracePeriodSeconds: 60
+  tolerations: []
+  topologySpreadConstraints: []
+  verticalPodAutoscaling:
+    enabled: false
+  vmbackupmanager:
+    destination: ""
+    disableDaily: false
+    disableHourly: false
+    disableMonthly: false
+    disableWeekly: false
+    enabled: false
+    env: []
+    extraArgs:
+      envflag.enable: true
+      envflag.prefix: VM_
+      loggerFormat: json
+    extraSecretMounts: []
+    image:
+      registry: ""
+      repository: victoriametrics/vmbackupmanager
+      tag: ""
+      variant: cluster
+    probe:
+      liveness:
+        failureThreshold: 10
+        initialDelaySeconds: 30
+        periodSeconds: 30
+        tcpSocket:
+          port: manager-http
+        timeoutSeconds: 5
+      readiness:
+        failureThreshold: 10
+        httpGet:
+          port: manager-http
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        timeoutSeconds: 5
+      startup: {}
+    resources: {}
+    restore:
+      onStart:
+        enabled: false
+    retention:
+      keepLastDaily: 2
+      keepLastHourly: 2
+      keepLastMonthly: 2
+      keepLastWeekly: 2
